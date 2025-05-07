@@ -20,9 +20,11 @@ function AdminDashboardUI() {
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [selectedMentor, setSelectedMentor] = useState(null);
+  const [approvedMentors, setApprovedMentors] = useState([]);
 
   useEffect(() => {
     fetchMentorRequests();
+    fetchApprovedMentors();
   }, []);
 
   const fetchMentorRequests = async () => {
@@ -65,6 +67,7 @@ function AdminDashboardUI() {
         ...item.mentorData,
         userType: "mentor",
         isApproved: true,
+        status: "approved",
         approvedAt: new Date().toISOString(),
       };
 
@@ -110,20 +113,20 @@ function AdminDashboardUI() {
     }
   };
 
-  const approvedMentors = [
-    {
-      id: 1,
-      name: "Alex Johnson",
-      email: "alex@example.com",
-      expertise: "Python, Machine Learning",
-    },
-    {
-      id: 2,
-      name: "Sarah Williams",
-      email: "sarah@example.com",
-      expertise: "JavaScript, React",
-    },
-  ];
+  const fetchApprovedMentors = async () => {
+    try {
+      const mentorsSnap = await getDocs(collection(db, "mentors"));
+      const mentorsList = mentorsSnap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setApprovedMentors(mentorsList);
+      console.log("Fetched Approved Mentors:", mentorsList);
+    } catch (error) {
+      console.error("Error fetching approved mentors:", error);
+      alert("Approved mentors fetch karne mein error aaya.");
+    }
+  };
 
   const allUsers = [
     {
@@ -388,20 +391,26 @@ function AdminDashboardUI() {
                             className="hover:bg-gray-600/40 transition-colors duration-200"
                           >
                             <td className="px-4 sm:px-6 py-4 text-sm sm:text-base text-white font-medium">
-                              {mentor.name}
+                              {mentor.name || "N/A"}
                             </td>
                             <td className="px-4 sm:px-6 py-4 text-sm sm:text-base text-gray-300">
-                              {mentor.email}
+                              {mentor.email || "N/A"}
                             </td>
                             <td className="px-4 sm:px-6 py-4 text-sm sm:text-base text-gray-300">
-                              {mentor.expertise}
+                              {mentor.skills || + "," +  mentor.expertise || "N/A"}
                             </td>
                             <td className="px-4 sm:px-6 py-4 text-sm sm:text-base">
                               <div className="flex space-x-3">
-                                <button className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-3 sm:px-4 py-1 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 shadow-md hover:shadow-yellow-500/30">
+                                <Link
+                                  to={`/editMentor/${mentor.id}`}
+                                  className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-3 sm:px-4 py-1 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 shadow-md hover:shadow-yellow-500/30"
+                                >
                                   Edit
-                                </button>
-                                <button className="bg-red-600 hover:bg-red-700 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 shadow-md hover:shadow-red-600/30">
+                                </Link>
+                                <button
+                                  onClick={() => handleDeleteMentor(mentor.id)}
+                                  className="bg-red-600 hover:bg-red-700 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors duration-200 shadow-md hover:shadow-red-600/30"
+                                >
                                   Delete
                                 </button>
                               </div>
@@ -414,7 +423,6 @@ function AdminDashboardUI() {
                 )}
               </div>
             )}
-
             {/* All Users Tab */}
             {activeTab === "users" && (
               <div className="space-y-6">

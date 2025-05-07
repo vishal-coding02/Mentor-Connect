@@ -95,6 +95,10 @@ function Login() {
           userType: userData.userType,
           userName: user.displayName || userData.name,
           userProfilePhoto: userData.profilePhoto || user.photoURL || "",
+          isApproved: userData.isApproved || null,
+          reapprovalStatus: userData.reapprovalStatus || null,
+          reapprovalFields: userData.reapprovalFields || [],
+          reapprovalReason: userData.reapprovalReason || "",
         })
       );
 
