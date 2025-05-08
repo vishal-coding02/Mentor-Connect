@@ -1,7 +1,10 @@
 import React from "react";
 import { signOut } from "firebase/auth";
+import { auth } from "../BACKEND/firebase";
+import { useNavigate } from "react-router-dom";
 
 function PendingMentor() {
+  const navigate = useNavigate()
   const handleLogout = async () => {
     try {
       await signOut(auth);
