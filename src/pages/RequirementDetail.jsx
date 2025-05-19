@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link, useParams } from "react-router-dom";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../BACKEND/firebase";
@@ -7,7 +8,7 @@ function RequirementDetail() {
   const { requirementId } = useParams();
   const [requirement, setRequirement] = useState(null);
   const [error, setError] = useState(null);
-  const [showContact, setShowContact] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!requirementId) {
@@ -227,7 +228,7 @@ function RequirementDetail() {
                     Connect with Student
                   </h2>
                   <button
-                    onClick={() => setShowContact(!showContact)}
+                    onClick={() => navigate("/unLockContact")}
                     className="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-4 rounded-lg transition flex items-center justify-center"
                   >
                     <svg
@@ -241,14 +242,6 @@ function RequirementDetail() {
                     </svg>
                     Contact Student
                   </button>
-                  {showContact && requirement.phone && (
-                    <div className="mt-4">
-                      <p className="text-sm text-gray-400">Phone Number</p>
-                      <p className="font-medium text-yellow-400">
-                        {requirement.phone}
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

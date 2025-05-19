@@ -1,9 +1,10 @@
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
+// import { useState } from "react";
 import { useContext } from "react";
 import { LoginContext } from "../Context/LoginContext";
 function UserProfile() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
   const { userEmail, userName, UserProfilePhoto } = useContext(LoginContext);
 
   // Hardcoded user data
@@ -34,7 +35,7 @@ function UserProfile() {
 
       {/* User Profile Section */}
       <section className="bg-gradient-to-br from-gray-800 via-gray-900 to-blue-900 pt-24 pb-20 min-h-screen flex items-center">
-        <div className="container mx-auto px-4 sm:px-6">
+        <div className="container lg:m-12 mx-auto px-4 sm:px-6">
           <div className="max-w-4xl mx-auto bg-gray-800 rounded-xl shadow-lg overflow-hidden">
             {/* Header Card */}
             <div className="bg-gray-700 px-4 sm:px-6 md:px-8 py-4 sm:py-6 border-b border-gray-600 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -64,9 +65,9 @@ function UserProfile() {
                   <h3 className="text-xl sm:text-2xl font-semibold text-white">
                     {user.name}
                   </h3>
-                  <p className="text-gray-400 mt-1 text-sm sm:text-base">
+                  {/* <p className="text-gray-400 mt-1 text-sm sm:text-base">
                     {user.email}
-                  </p>
+                  </p> */}
                   {user.bio && (
                     <p className="text-gray-200 mt-2 text-sm sm:text-base leading-relaxed">
                       {user.bio}

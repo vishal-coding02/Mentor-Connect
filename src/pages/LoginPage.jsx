@@ -264,17 +264,17 @@ function Login() {
               <div className="mt-6">
                 <p className="block text-gray-300 mb-2">Continue with Google</p>
                 <button
-                  className="w-full bg-gray-900 text-yellow-400 px-6 py-2 rounded-lg font-semibold shadow-md transform hover:scale-105 transition duration-300 mt-2"
+                  className="w-full bg-gray-900 text-yellow-400 cursor-pointer px-6 py-2 rounded-lg font-semibold shadow-md transform hover:scale-105 transition duration-300 mt-2"
                   onClick={googleSignIn}
                 >
-                  Sign in with Google
+                  Sign in with <i className="fa-brands fa-google"></i>
                 </button>
               </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-yellow-400 text-gray-900 px-8 py-3 rounded-lg font-semibold shadow-lg hover:bg-yellow-500 transform hover:scale-105 transition duration-300"
+                className="w-full bg-yellow-400 text-gray-900 cursor-pointer px-8 py-3 rounded-lg font-semibold shadow-lg hover:bg-yellow-500 transform hover:scale-105 transition duration-300"
               >
                 Log In
               </button>

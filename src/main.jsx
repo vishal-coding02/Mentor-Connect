@@ -21,6 +21,8 @@ import ReApproveMentor from "./components/ReApproveMentor";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./Store";
+import UnlockContact from "./components/UnlockContact";
+import BuyCoins from "./pages/BuyCoins";
 
 const router = createBrowserRouter([
   {
@@ -89,8 +91,16 @@ const router = createBrowserRouter([
   },
   ,
   {
-    path: "pendingMentor",
+    path: "/pendingMentor",
     element: <PendingMentor />,
+  },
+  {
+    path: "/unLockContact",
+    element: <UnlockContact />,
+  },
+  {
+    path: "/buyCoins",
+    element: <BuyCoins />,
   },
 ]);
 

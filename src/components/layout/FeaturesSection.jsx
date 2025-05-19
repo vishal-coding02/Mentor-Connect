@@ -20,7 +20,7 @@ const FeaturesSection = () => {
             <div className="text-yellow-400 text-4xl sm:text-5xl mb-3 sm:mb-4">
               ✍️
             </div>
-            <h2
+            <Link
               onClick={() => {
                 if (loginState) {
                   navigate("/postRequirement:id");
@@ -31,7 +31,7 @@ const FeaturesSection = () => {
               className="text-xl sm:text-2xl font-semibold text-white mb-3 sm:mb-4"
             >
               Request Mentorship
-            </h2>
+            </Link>
             <p className="text-sm sm:text-base text-gray-300">
               Post detailed requests and let our system match you with the
               perfect mentor.

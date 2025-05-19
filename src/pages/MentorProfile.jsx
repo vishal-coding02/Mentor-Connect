@@ -3,12 +3,15 @@ import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { auth } from "../BACKEND/firebase";
 import { db } from "../BACKEND/firebase";
+import { useNavigate } from "react-router-dom";
 import { getDoc, doc } from "firebase/firestore";
-
+import { useContext } from "react";
+import { LoginContext } from "../Context/LoginContext";
 function MentorProfile() {
   const [mentorData, setMentorData] = useState(null);
   const [error, setError] = useState(null);
-
+  const { userType } = useContext(LoginContext);
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchMentorData = async () => {
       try {
@@ -68,40 +71,24 @@ function MentorProfile() {
 
   if (!mentorData) {
     return (
-      <div className="min-h-screen bg-gray-900 text-gray-200 font-sans flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-lg">found mentor data.</p>
-        </div>
+      <div className="min-h-screen bg-gray-900 text-white flex justify-center items-center">
+        <svg
+          className="animate-spin h-8 w-8 text-yellow-400"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+            fill="none"
+          />
+          <path fill="currentColor" d="M4 12a8 8 0 018-8v8h-8z" />
+        </svg>
       </div>
     );
   }
-  // const mentorData = {
-  //   fullName: "John Doe",
-  //   profilePicture: "https://randomuser.me/api/portraits/men/1.jpg",
-  //   professionalTitle: "Senior React Developer",
-  //   bio: "A passionate Senior React Developer with over 10 years of experience in building scalable web applications. I love mentoring students and helping them master modern JavaScript frameworks.",
-  //   skills: ["React", "Node.js", "JavaScript", "TypeScript", "CSS", "Git", "Redux", "GraphQL"],
-  //   primaryCategory: "Web Development",
-  //   experienceLevel: "Senior",
-  //   yearsOfExperience: "10",
-  //   highestQualification: "Master's in Computer Science",
-  //   certifications: ["AWS Certified Developer", "React Certified", "Google Cloud Engineer"],
-  //   experience: "10+ years in web development at top tech companies",
-  //   teachingStyle: "Interactive, hands-on coding sessions with real-world projects",
-  //   languages: ["English", "Hindi", "Spanish"],
-  //   timeSlots: ["Weekdays 5-7 PM", "Weekends 10 AM - 1 PM"],
-  //   preferredDays: ["Monday", "Wednesday", "Friday", "Saturday"],
-  //   timeZone: "GMT+5:30 (IST)",
-  //   sessionPrice: "50",
-  //   currency: "USD",
-  //   sessionDuration: "60",
-  //   linkedin: "https://linkedin.com",
-  //   github: "https://github.com",
-  //   portfolio: "https://myportfolio.com",
-  //   youtube: "https://youtube.com",
-  //   demoVideo: "https://example.com/demo.mp4",
-  //   resume: "https://example.com/resume.pdf"
-  // };
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 font-sans">
@@ -522,7 +509,7 @@ function MentorProfile() {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <button className="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium shadow-md transition duration-300 flex items-center justify-center gap-2">
+                <button className="bg-gray-800 cursor-pointer  hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium shadow-md transition duration-300 flex items-center justify-center gap-2">
                   <svg
                     className="w-5 h-5"
                     fill="none"
@@ -539,7 +526,11 @@ function MentorProfile() {
                   </svg>
                   View Resume
                 </button>
-                <button className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-lg font-semibold shadow-md transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2">
+                {/* {userType === "student" && ( */}
+                <button
+                  onClick={() => navigate("/unLockContact")}
+                  className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-lg font-semibold shadow-md transform hover:scale-105 transition duration-300 flex items-center justify-center gap-2"
+                >
                   <svg
                     className="w-5 h-5"
                     fill="none"
@@ -556,6 +547,7 @@ function MentorProfile() {
                   </svg>
                   Book a Session
                 </button>
+                {/* )} */}
               </div>
             </div>
           </div>

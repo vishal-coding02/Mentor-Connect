@@ -81,6 +81,31 @@ function Signup() {
     }
   }, [formData.password]);
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const validImageTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
+        "image/gif",
+      ];
+      if (!validImageTypes.includes(file.type)) {
+        alert("Please upload a valid image file (JPEG/JPG/PNG/GIF)");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev) => ({
+          ...prev,
+          profilePhoto: file,
+          previewPhoto: reader.result,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Cloudinary configuration
   const cloudName = "dfw9zclpa";
   const uploadPreset = "ml_default";
@@ -208,7 +233,7 @@ function Signup() {
   async function googleSignUp(e) {
     e.preventDefault();
     try {
-      if (!formData.mobileNumber || !formData.userType) {
+      if (!formData.mobileNumber && !formData.userType) {
         alert("Please fill all required fields");
         return;
       }
@@ -293,15 +318,15 @@ function Signup() {
                   >
                     Profile Photo {uploading && "(Uploading...)"}
                   </label>
+                  <img
+                    className="w-[70px] h-[70px] mt-2 mb-3 rounded-[50%]"
+                    src={formData.previewPhoto}
+                    alt={formData.previewPhoto}
+                  />
                   <input
                     type="file"
                     id="profilePhoto"
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        profilePhoto: e.target.files[0],
-                      })
-                    }
+                    onChange={handleFileUpload}
                     className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-yellow-400 transition duration-300"
                     accept="image/*"
                   />
@@ -470,10 +495,9 @@ function Signup() {
                   <button
                     type="button"
                     onClick={googleSignUp}
-                    className="w-full flex items-center justify-center gap-2 bg-gray-900 text-yellow-400 px-6 py-2 rounded-lg font-semibold hover:bg-gray-800 transition duration-300"
+                    className="w-full bg-gray-900 text-yellow-400 cursor-pointer px-6 py-2 rounded-lg font-semibold shadow-md transform hover:scale-105 transition duration-300 mt-2"
                   >
-                    <i className="fa-brands fa-google"></i>
-                    Sign up with Google
+                    Sign up with <i className="fa-brands fa-google"></i>
                   </button>
                 </div>
 
@@ -481,7 +505,7 @@ function Signup() {
                   <button
                     type="submit"
                     disabled={uploading}
-                    className={`w-full bg-yellow-400 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-500 transition duration-300 ${
+                    className={`w-full bg-yellow-400 text-gray-900 cursor-pointer px-8 py-3 rounded-lg font-semibold shadow-lg hover:bg-yellow-500 transform hover:scale-105 transition duration-300 ${
                       uploading ? "opacity-70 cursor-not-allowed" : ""
                     }`}
                   >
