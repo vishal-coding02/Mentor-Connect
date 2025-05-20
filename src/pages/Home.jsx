@@ -3,6 +3,7 @@ import MentorHome from "./MentorHomePage";
 import StudentHomePage from "./StudentHomePage";
 import { useContext } from "react";
 import { LoginContext } from "../Context/LoginContext";
+
 const Home = () => {
   const { userType } = useContext(LoginContext);
 

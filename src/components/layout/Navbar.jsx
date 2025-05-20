@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { LoginContext } from "../../Context/LoginContext";
 import { auth } from "../../BACKEND/firebase";
 import { signOut } from "firebase/auth";
+import BuyCoins from "../../pages/BuyCoins";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -78,6 +79,12 @@ const Navbar = () => {
             className="block py-2 px-4 sm:px-6 text-base sm:text-lg hover:text-yellow-300 transition duration-300"
           >
             About
+          </Link>
+          <Link
+            to="/buyCoins"
+            className="block py-2 px-4 sm:px-6 text-base sm:text-lg hover:text-yellow-300 transition duration-300"
+          >
+            Buy Coins
           </Link>
           {/* <Link
             to="/mentorDashboard"
@@ -236,4 +243,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
