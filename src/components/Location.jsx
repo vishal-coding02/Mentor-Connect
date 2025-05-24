@@ -36,7 +36,7 @@ function LocationInput({ value, onChange }) {
         value={value}
         onChange={handleInputChange}
         placeholder="Enter your location"
-        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200"
+        className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300"
       />
       {suggestions.length > 0 && (
         <ul className="absolute z-10 bg-gray-800 border border-gray-600 w-full mt-1 max-h-60 overflow-y-auto rounded-md shadow-lg">

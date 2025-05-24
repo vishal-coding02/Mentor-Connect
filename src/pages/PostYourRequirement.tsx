@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { useNavigate } from "react-router-dom";
@@ -7,11 +7,16 @@ import { setDoc, doc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth } from "../BACKEND/firebase.js";
 import LocationInput from "../components/Location.jsx";
+import type {
+  Requirement,
+  MeetingOpt,
+  CurrencyRates,
+} from "../interfaces/PostReqInterface";
 
-function RequestMentorship() {
+const RequestMentorship: React.FC = () => {
   const navigate = useNavigate();
 
-  const allSubjects = [
+  const allSubjects: string[] = [
     "React JS",
     "React Native",
     "JavaScript",
@@ -64,7 +69,7 @@ function RequestMentorship() {
     "Web3.js",
   ];
 
-  const [requirement, setRequirement] = useState({
+  const [requirement, setRequirement] = useState<Requirement>({
     location: "",
     phone: "",
     requirementDetails: "",
@@ -81,13 +86,13 @@ function RequestMentorship() {
     files: [],
   });
 
-  const [meetingOptions, setMeetingOptions] = useState({
+  const [meetingOptions, setMeetingOptions] = useState<MeetingOpt>({
     online: false,
     atMyPlace: false,
     travelToTutor: false,
   });
 
-  const [currencyRates] = useState({
+  const [currencyRates] = useState<CurrencyRates>({
     AFN: 80.0,
     ALL: 95.0,
     DZD: 135.0,
@@ -233,13 +238,13 @@ function RequestMentorship() {
     ZMW: 27.0,
   });
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const filteredSubjects = allSubjects.filter((subject) =>
     subject.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSubjectSelect = (subject) => {
+  const handleSubjectSelect = (subject: string) => {
     if (!requirement.subjects.includes(subject)) {
       setRequirement({
         ...requirement,
@@ -248,7 +253,7 @@ function RequestMentorship() {
     }
   };
 
-  const handleSubjectRemove = (subjectToRemove) => {
+  const handleSubjectRemove = (subjectToRemove: string) => {
     setRequirement({
       ...requirement,
       subjects: requirement.subjects.filter(
@@ -268,16 +273,18 @@ function RequestMentorship() {
     }
   };
 
-  const handleLanguageAdd = (e) => {
-    if (e.target.value && !requirement.languages.includes(e.target.value)) {
+  const handleLanguageAdd = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const lang = e.target.value;
+    if (lang && !requirement.languages.includes(lang)) {
       setRequirement({
         ...requirement,
-        languages: [...requirement.languages, e.target.value],
+        languages: [...requirement.languages, lang],
       });
     }
+    e.target.value = "";
   };
 
-  const handleLanguageRemove = (languageToRemove) => {
+  const handleLanguageRemove = (languageToRemove: string) => {
     setRequirement({
       ...requirement,
       languages: requirement.languages.filter(
@@ -286,8 +293,10 @@ function RequestMentorship() {
     });
   };
 
-  const handleFileUpload = async (e) => {
-    const files = Array.from(e.target.files);
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+
+    const files = Array.from(e.target.files) as File[];
     const uploadedFiles = await Promise.all(
       files.map(async (file) => {
         const storageRef = ref(storage, `requirements/${file.name}`);
@@ -301,20 +310,25 @@ function RequestMentorship() {
     });
   };
 
-  const handleBudgetChange = (e) => {
+  const handleBudgetChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
       setRequirement({ ...requirement, budget: value });
     }
   };
 
-  const convertBudget = (amount, fromCurrency, toCurrency) => {
+  const convertBudget = (
+    amount: string,
+    fromCurrency: string,
+    toCurrency: string
+  ) => {
     if (!amount) return "";
-    const usdAmount = amount / currencyRates[fromCurrency];
-    return (usdAmount * currencyRates[toCurrency]).toFixed(2);
+    const amountNum = parseFloat(amount);
+    const usdAmount = amountNum / (currencyRates as any)[fromCurrency];
+    return (usdAmount * (currencyRates as any)[toCurrency]).toFixed(2);
   };
 
-  async function handleSubmitForm(e) {
+  async function handleSubmitForm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
       const user = auth.currentUser;
@@ -386,7 +400,7 @@ function RequestMentorship() {
                   </label>
                   <LocationInput
                     value={requirement.location}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                       setRequirement({ ...requirement, location: value })
                     }
                   />
@@ -858,14 +872,14 @@ function RequestMentorship() {
                   <textarea
                     id="requirementDetails"
                     value={requirement.requirementDetails}
-                    onChange={(e) =>
+                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
                       setRequirement({
                         ...requirement,
                         requirementDetails: e.target.value,
                       })
                     }
                     className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300"
-                    rows="5"
+                    rows={5}
                     placeholder="Please describe your requirement in detail..."
                     required
                   />
@@ -881,7 +895,7 @@ function RequestMentorship() {
                   <select
                     id="tutorLocation"
                     value={requirement.tutorLocation}
-                    onChange={(e) =>
+                    onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                       setRequirement({
                         ...requirement,
                         tutorLocation: e.target.value,
@@ -1020,6 +1034,6 @@ function RequestMentorship() {
       <Footer />
     </div>
   );
-}
+};
 
 export default RequestMentorship;

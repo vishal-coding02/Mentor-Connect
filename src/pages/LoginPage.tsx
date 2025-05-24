@@ -1,6 +1,6 @@
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { Link } from "react-router-dom";
 import { auth, db } from "../BACKEND/firebase.js";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -9,13 +9,14 @@ import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { LoginContext } from "../Context/LoginContext.jsx";
-import { login } from "../reducer/LogingReducer.jsx";
-import { useDispatch } from "react-redux";
+// import { login } from "../reducer/LogingReducer.jsx";
+// import { useDispatch } from "react-redux";
+import type { LoginForm, LoginContextType } from "../interfaces/LoginInterface";
 
-function Login() {
+const Login = () => {
   const navigate = useNavigate();
-  const [showPass, setShowPass] = useState(null);
-  const dispatch = useDispatch();
+  const [showPass, setShowPass] = useState<boolean>(false);
+  // const dispatch = useDispatch();
   const {
     setLoginState,
     setUserEmail,
@@ -25,8 +26,8 @@ function Login() {
     userType,
     reapprovalStatus,
     isApproved,
-  } = useContext(LoginContext);
-  const [signIn, setSignIn] = useState({
+  } = useContext(LoginContext) as LoginContextType;
+  const [signIn, setSignIn] = useState<LoginForm>({
     userEmail: "",
     userPassword: "",
   });
@@ -50,7 +51,7 @@ function Login() {
     }
   }, [userType, reapprovalStatus, navigate, isApproved]);
 
-  async function handleSignIn(e) {
+  async function handleSignIn(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -74,7 +75,7 @@ function Login() {
 
       // localStorage
       localStorage.setItem("userName", user.displayName || userData.name);
-      localStorage.setItem("userEmail", user.email);
+      localStorage.setItem("userEmail", user.email || "");
       localStorage.setItem("userAccessToken", user.uid);
       localStorage.setItem("userType", userData.userType);
       localStorage.setItem(
@@ -89,18 +90,18 @@ function Login() {
       setUserProfilePhoto(userData.profilePhoto || user.photoURL || "");
       setLoginState(true);
 
-      dispatch(
-        login({
-          userEmail: user.email,
-          userType: userData.userType,
-          userName: user.displayName || userData.name,
-          userProfilePhoto: userData.profilePhoto || user.photoURL || "",
-          isApproved: userData.isApproved || null,
-          reapprovalStatus: userData.reapprovalStatus || null,
-          reapprovalFields: userData.reapprovalFields || [],
-          reapprovalReason: userData.reapprovalReason || "",
-        })
-      );
+      // dispatch(
+      //   login({
+      //     userEmail: user.email,
+      //     userType: userData.userType,
+      //     userName: user.displayName || userData.name,
+      //     userProfilePhoto: userData.profilePhoto || user.photoURL || "",
+      //     isApproved: userData.isApproved || null,
+      //     reapprovalStatus: userData.reapprovalStatus || null,
+      //     reapprovalFields: userData.reapprovalFields || [],
+      //     reapprovalReason: userData.reapprovalReason || "",
+      //   })
+      // );
 
       alert("User Logged In Successfully!");
       console.log("Firestore Data:", userData);
@@ -113,7 +114,7 @@ function Login() {
       } else if (userData.userType === "admin") {
         navigate("/adminDashBoard");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login Failed:", error.message);
       alert("Login Failed: " + error.message);
     }
@@ -147,7 +148,7 @@ function Login() {
 
       // localStorage
       localStorage.setItem("userName", user.displayName || userData.name);
-      localStorage.setItem("userEmail", user.email);
+      localStorage.setItem("userEmail", user.email || "");
       localStorage.setItem("userAccessToken", user.uid);
       localStorage.setItem("userType", userData.userType);
       localStorage.setItem(
@@ -161,14 +162,14 @@ function Login() {
       setUserProfilePhoto(userData.profilePhoto || user.photoURL || "");
       setLoginState(true);
 
-      dispatch(
-        login({
-          userEmail: user.email,
-          userType: userData.userType,
-          userName: user.displayName || userData.name,
-          userProfilePhoto: userData.profilePhoto || user.photoURL || "",
-        })
-      );
+      // dispatch(
+      //   login({
+      //     userEmail: user.email,
+      //     userType: userData.userType,
+      //     userName: user.displayName || userData.name,
+      //     userProfilePhoto: userData.profilePhoto || user.photoURL || "",
+      //   })
+      // );
 
       alert("Login successful!");
       console.log("Firestore Data:", userData);
@@ -181,7 +182,7 @@ function Login() {
       } else if (userData.userType === "admin") {
         navigate("/adminDashBoard");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Google SignIn Error:", error.message);
       alert(error.message);
     }
@@ -216,7 +217,7 @@ function Login() {
                   id="email"
                   value={signIn.userEmail}
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-yellow-400 transition duration-300"
-                  onChange={(e) => {
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     setSignIn({ ...signIn, userEmail: e.target.value });
                   }}
                   placeholder="Enter your email"
@@ -234,7 +235,7 @@ function Login() {
                   id="password"
                   value={signIn.userPassword}
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-yellow-400 transition duration-300"
-                  onChange={(e) => {
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     setSignIn({ ...signIn, userPassword: e.target.value });
                   }}
                   placeholder="Enter your password"
@@ -298,6 +299,6 @@ function Login() {
       <Footer />
     </div>
   );
-}
+};
 
 export default Login;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
@@ -9,6 +9,7 @@ import {
   sendEmailVerification,
   deleteUser,
 } from "firebase/auth";
+import type { SignupContextType, SignUpForm } from "../interfaces/SignupInterface"
 import { setDoc, doc } from "firebase/firestore";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useContext } from "react";
@@ -22,23 +23,24 @@ function Signup() {
     setUserName,
     setUserType,
     setUserProfilePhoto,
-  } = useContext(LoginContext);
-  const [showPass, setShowPass] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(null);
-  const [formData, setFormData] = useState({
+  } = useContext(LoginContext) as SignupContextType;
+  const [showPass, setShowPass] = useState<boolean>(false);
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [passwordStrength, setPasswordStrength] = useState<string>("");
+  const [formData, setFormData] = useState<SignUpForm>({
     name: "",
     email: "",
     mobileNumber: "",
     password: "",
     userType: "",
     profilePhoto: null,
+    previewPhoto: null,
   });
 
   useEffect(() => {
     const { password } = formData;
     if (!password) {
-      setPasswordStrength(null);
+      setPasswordStrength("");
       return;
     }
 
@@ -81,10 +83,10 @@ function Signup() {
     }
   }, [formData.password]);
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = (e: any) => {
     const file = e.target.files[0];
     if (file) {
-      const validImageTypes = [
+      const validImageTypes: string[] = [
         "image/jpeg",
         "image/png",
         "image/jpg",
@@ -99,7 +101,7 @@ function Signup() {
         setFormData((prev) => ({
           ...prev,
           profilePhoto: file,
-          previewPhoto: reader.result,
+          previewPhoto: reader.result as string,
         }));
       };
       reader.readAsDataURL(file);
@@ -107,10 +109,10 @@ function Signup() {
   };
 
   // Cloudinary configuration
-  const cloudName = "dfw9zclpa";
-  const uploadPreset = "ml_default";
+  const cloudName: string = "dfw9zclpa";
+  const uploadPreset: string = "ml_default";
 
-  const uploadImageToCloudinary = async (file) => {
+  const uploadImageToCloudinary = async (file: any) => {
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -126,17 +128,17 @@ function Signup() {
         }
       );
 
-      const data = await response.json();
+      const data: any = await response.json();
       setUploading(false);
       return data.secure_url;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading image:", error);
       setUploading(false);
       return null;
     }
   };
 
-  async function registerUser(e) {
+  async function registerUser(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
       if (!formData.mobileNumber || !formData.userType) {
@@ -157,8 +159,8 @@ function Signup() {
       alert("Verification email sent. Please verify your email.");
 
       // Check for email verification
-      let isVerified = false;
-      let attempts = 0;
+      let isVerified: boolean = false;
+      let attempts: number = 0;
 
       while (attempts < 15) {
         await user.reload();
@@ -177,7 +179,7 @@ function Signup() {
       }
 
       // Upload profile photo to Cloudinary if exists
-      let profileURL = "";
+      let profileURL: string = "";
       if (formData.profilePhoto) {
         profileURL = await uploadImageToCloudinary(formData.profilePhoto);
         if (!profileURL) {
@@ -224,14 +226,13 @@ function Signup() {
       console.log(user);
       console.log("Profile Photo URL saved to Firestore:", profileURL);
       alert("Signup successful!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Signup Error:", error.message);
       alert(error.message);
     }
   }
 
-  async function googleSignUp(e) {
-    e.preventDefault();
+  async function googleSignUp() {
     try {
       if (!formData.mobileNumber && !formData.userType) {
         alert("Please fill all required fields");
@@ -245,7 +246,7 @@ function Signup() {
       const user = result.user;
 
       // Upload custom profile photo if selected
-      let profileURL = user.photoURL || "";
+      let profileURL: string = user.photoURL || "";
       if (formData.profilePhoto) {
         profileURL = await uploadImageToCloudinary(formData.profilePhoto);
       }
@@ -266,7 +267,7 @@ function Signup() {
         "userName",
         user.displayName || formData.name || "User"
       );
-      localStorage.setItem("userEmail", user.email);
+      localStorage.setItem("userEmail", user.email || "");
       localStorage.setItem("userAccessToken", user.uid);
       localStorage.setItem("userType", formData.userType);
       localStorage.setItem(
@@ -291,7 +292,7 @@ function Signup() {
       alert("Google Signup Successful!");
       console.log("Profile Photo URL saved to Firestore:", profileURL);
       console.log(user);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Google Signup Error:", error.message);
       alert(error.message);
     }
@@ -319,10 +320,15 @@ function Signup() {
                     Profile Photo {uploading && "(Uploading...)"}
                   </label>
                   <img
-                    className="w-[70px] h-[70px] mt-2 mb-3 rounded-[50%]"
-                    src={formData.previewPhoto}
-                    alt={formData.previewPhoto}
+                    src={
+                      typeof formData.previewPhoto === "string"
+                        ? formData.previewPhoto
+                        : undefined
+                    }
+                    alt="preview"
+                    className="w-20 h-20 rounded-full object-cover"
                   />
+
                   <input
                     type="file"
                     id="profilePhoto"
@@ -343,7 +349,7 @@ function Signup() {
                     type="text"
                     id="name"
                     value={formData.name}
-                    onChange={(e) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
                     required
@@ -363,7 +369,7 @@ function Signup() {
                     type="email"
                     id="email"
                     value={formData.email}
-                    onChange={(e) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
                     required
@@ -383,7 +389,7 @@ function Signup() {
                     type="tel"
                     id="mobileNumber"
                     value={formData.mobileNumber}
-                    onChange={(e) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setFormData({ ...formData, mobileNumber: e.target.value })
                     }
                     required
@@ -402,7 +408,7 @@ function Signup() {
                     type={showPass ? "text" : "password"}
                     id="password"
                     value={formData.password}
-                    onChange={(e) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
                     required
@@ -458,7 +464,7 @@ function Signup() {
                       value="mentor"
                       name="userType"
                       checked={formData.userType === "mentor"}
-                      onChange={(e) =>
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setFormData({ ...formData, userType: e.target.value })
                       }
                       className="mr-2"
@@ -475,7 +481,7 @@ function Signup() {
                       value="student"
                       name="userType"
                       checked={formData.userType === "student"}
-                      onChange={(e) =>
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setFormData({ ...formData, userType: e.target.value })
                       }
                       className="mr-2"

@@ -397,7 +397,9 @@ function AdminDashboardUI() {
                               {mentor.email || "N/A"}
                             </td>
                             <td className="px-4 sm:px-6 py-4 text-sm sm:text-base text-gray-300">
-                              {mentor.skills || + "," +  mentor.expertise || "N/A"}
+                              {mentor.skills ||
+                                +"," + mentor.expertise ||
+                                "N/A"}
                             </td>
                             <td className="px-4 sm:px-6 py-4 text-sm sm:text-base">
                               <div className="flex space-x-3">

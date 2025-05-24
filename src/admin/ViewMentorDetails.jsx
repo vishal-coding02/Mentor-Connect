@@ -135,7 +135,9 @@ function ViewMentorDetails() {
       });
 
       // Prepare Update Link
-      const updateLink = `${import.meta.env.VITE_REACT_APP_BASE_URL}/mentorProfileCreate/${id}`;
+      const updateLink = `${
+        import.meta.env.VITE_REACT_APP_BASE_URL
+      }/mentorProfileCreate/${id}`;
       console.log("Sending updateLink:", updateLink);
 
       // Send Re-Approval Email

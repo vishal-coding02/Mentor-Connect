@@ -1,10 +1,10 @@
 import emailjs from "emailjs-com";
 
-const SERVICE_ID = "service_pj38ic4";
-const APPROVAL_TEMPLATE_ID = "template_wbi6dyk";
-const PUBLIC_KEY = "I0V8D80ZeFRR4AnJ0";
+const SERVICE_ID: string = "service_pj38ic4";
+const APPROVAL_TEMPLATE_ID: string = "template_wbi6dyk";
+const PUBLIC_KEY: string = "I0V8D80ZeFRR4AnJ0";
 
-const ApprovedEmail = async (toEmail, toName) => {
+const ApprovedEmail = async (toEmail: string, toName: string) => {
   try {
     const templateParams = {
       to_name: toName,
@@ -18,7 +18,7 @@ const ApprovedEmail = async (toEmail, toName) => {
       PUBLIC_KEY
     );
     console.log("Approval Email Sent!");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error sending email:", error.text || error);
   }
 };
