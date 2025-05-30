@@ -1,17 +1,21 @@
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
-import { LoginContext } from "../Context/LoginContext"; // Adjust path as per your project
+import { useSelector, useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../BACKEND/firebase";
 import { signOut } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { resetAuthState } from "../reducer/LogingReducer";
 
 const ReApproveMentor = () => {
-  const { reapprovalFields, reapprovalReason } = useContext(LoginContext);
+  const { reapprovalFields, reapprovalReason } = useSelector(
+    (state) => state.auth
+  );
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      dispatch(resetAuthState());
       navigate("/login");
       alert("Logged out successfully!");
     } catch (error) {

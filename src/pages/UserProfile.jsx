@@ -1,11 +1,14 @@
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 // import { useState } from "react";
-import { useContext } from "react";
-import { LoginContext } from "../Context/LoginContext";
+import { useSelector } from "react-redux";
+
 function UserProfile() {
   // const [isModalOpen, setIsModalOpen] = useState(false);
-  const { userEmail, userName, UserProfilePhoto } = useContext(LoginContext);
+
+  const { userEmail, userName, UserProfilePhoto } = useSelector(
+    (state) => state.auth
+  );
 
   // Hardcoded user data
   const user = {

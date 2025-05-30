@@ -1,42 +1,32 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { LoginContext } from "../../Context/LoginContext";
+// Navbar.jsx — Redux Version (no context)
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { auth } from "../../BACKEND/firebase";
 import { signOut } from "firebase/auth";
-import BuyCoins from "../../pages/BuyCoins";
+import { resetAuthState } from "../../reducer/LogingReducer"; // Adjust path as needed
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const {
     userType,
-    setUserType,
     userEmail,
-    setUserEmail,
     userName,
-    setUserName,
-    setLoginState,
-    setUserProfilePhoto,
-    setIsApproved,
     reapprovalStatus,
     reapprovalFields,
     reapprovalReason,
-  } = useContext(LoginContext);
-
-  const navigate = useNavigate();
+  } = useSelector((state) => state.auth);
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
       localStorage.clear();
-      setLoginState(false);
-      setUserEmail(null);
-      setUserName(null);
-      setUserType(null);
-      setIsApproved(null);
-      setUserProfilePhoto(null);
+      dispatch(resetAuthState());
       alert("Logged out successfully!");
       navigate("/login");
     } catch (error) {
@@ -86,12 +76,7 @@ const Navbar = () => {
           >
             Buy Coins
           </Link>
-          {/* <Link
-            to="/mentorDashboard"
-            className="block py-2 px-4 sm:px-6 text-base sm:text-lg hover:text-yellow-300 transition duration-300"
-          >
-            Menotr DashBaord
-          </Link> */}
+
           {userType === "pendingMentor" &&
             reapprovalStatus === "reapproval_pending" && (
               <Link

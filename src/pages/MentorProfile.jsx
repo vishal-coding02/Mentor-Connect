@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { auth } from "../BACKEND/firebase";
 import { db } from "../BACKEND/firebase";
 import { useNavigate } from "react-router-dom";
 import { getDoc, doc } from "firebase/firestore";
-import { useContext } from "react";
-import { LoginContext } from "../Context/LoginContext";
+import { useSelector } from "react-redux";
 function MentorProfile() {
   const [mentorData, setMentorData] = useState(null);
   const [error, setError] = useState(null);
-  const { userType } = useContext(LoginContext);
+  const { userType } = useSelector((state) => state.auth);
+
   const navigate = useNavigate();
   useEffect(() => {
     const fetchMentorData = async () => {

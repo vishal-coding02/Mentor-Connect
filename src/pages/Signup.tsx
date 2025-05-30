@@ -1,44 +1,41 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Navbar from "../components/layout/Navbar.jsx";
+import Footer from "../components/layout/Footer.jsx";
 import { auth, db } from "../BACKEND/firebase.js";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   deleteUser,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { useContext } from "react";
-import { LoginContext } from "../Context/LoginContext.jsx";
+import { useDispatch } from "react-redux";
+import { setUserAuthData } from "../reducer/LogingReducer.jsx";
+import type { SignUpForm } from "../interfaces/SignupInterface.js";
 
-function Signup() {
+const Signup: React.FC = () => {
   const navigate = useNavigate();
-  const {
-    setLoginState,
-    setUserEmail,
-    setUserName,
-    setUserType,
-    setUserProfilePhoto,
-  } = useContext(LoginContext);
-  const [showPass, setShowPass] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(null);
-  const [formData, setFormData] = useState({
+  const dispatch = useDispatch();
+
+  const [showPass, setShowPass] = useState<boolean>(false);
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [passwordStrength, setPasswordStrength] = useState<string>("");
+  const [formData, setFormData] = useState<SignUpForm>({
     name: "",
     email: "",
     mobileNumber: "",
     password: "",
     userType: "",
     profilePhoto: null,
+    previewPhoto: null,
   });
 
   useEffect(() => {
     const { password } = formData;
     if (!password) {
-      setPasswordStrength(null);
+      setPasswordStrength("");
       return;
     }
 
@@ -81,10 +78,10 @@ function Signup() {
     }
   }, [formData.password]);
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
-      const validImageTypes = [
+      const validImageTypes: string[] = [
         "image/jpeg",
         "image/png",
         "image/jpg",
@@ -99,18 +96,17 @@ function Signup() {
         setFormData((prev) => ({
           ...prev,
           profilePhoto: file,
-          previewPhoto: reader.result,
+          previewPhoto: reader.result as string,
         }));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Cloudinary configuration
-  const cloudName = "dfw9zclpa";
-  const uploadPreset = "ml_default";
+  const cloudName: string = "dfw9zclpa";
+  const uploadPreset: string = "ml_default";
 
-  const uploadImageToCloudinary = async (file) => {
+  const uploadImageToCloudinary = async (file: File) => {
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -125,7 +121,6 @@ function Signup() {
           body: formData,
         }
       );
-
       const data = await response.json();
       setUploading(false);
       return data.secure_url;
@@ -136,7 +131,7 @@ function Signup() {
     }
   };
 
-  async function registerUser(e) {
+  async function registerUser(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
       if (!formData.mobileNumber || !formData.userType) {
@@ -144,7 +139,6 @@ function Signup() {
         return;
       }
 
-      // Create user in Firebase Auth
       const userResponse = await createUserWithEmailAndPassword(
         auth,
         formData.email,
@@ -152,13 +146,11 @@ function Signup() {
       );
       const user = userResponse.user;
 
-      // Send verification email
       await sendEmailVerification(user);
       alert("Verification email sent. Please verify your email.");
 
-      // Check for email verification
-      let isVerified = false;
-      let attempts = 0;
+      let isVerified: boolean = false;
+      let attempts: number = 0;
 
       while (attempts < 15) {
         await user.reload();
@@ -176,16 +168,12 @@ function Signup() {
         return;
       }
 
-      // Upload profile photo to Cloudinary if exists
-      let profileURL = "";
+      let profileURL: string = "";
       if (formData.profilePhoto) {
         profileURL = await uploadImageToCloudinary(formData.profilePhoto);
-        if (!profileURL) {
-          throw new Error("Failed to upload profile photo");
-        }
+        if (!profileURL) throw new Error("Failed to upload profile photo");
       }
 
-      // Save user data to Firestore
       await setDoc(doc(db, "users", user.uid), {
         name: formData.name,
         email: formData.email,
@@ -196,24 +184,16 @@ function Signup() {
         profilePhoto: profileURL,
       });
 
-      // Local Storage
-      localStorage.setItem("userName", formData.name || "User");
-      localStorage.setItem("userEmail", formData.email);
-      localStorage.setItem("userAccessToken", user.uid);
-      localStorage.setItem("userType", formData.userType);
-      localStorage.setItem(
-        "userProfilePhoto",
-        profileURL || user.photoURL || ""
+      dispatch(
+        setUserAuthData({
+          userName: formData.name,
+          userEmail: formData.email,
+          userType: formData.userType,
+          userProfilePhoto: profileURL || user.photoURL || "",
+          loginState: true,
+        })
       );
 
-      // // Context state update
-      setUserName(formData.name);
-      setUserEmail(formData.email);
-      setUserType(formData.userType);
-      setUserProfilePhoto(profileURL || user.photoURL || "");
-      setLoginState(true);
-
-      // Redirect based on user type
       if (formData.userType === "student") {
         navigate("/postRequirement:id");
       } else if (formData.userType === "mentor") {
@@ -221,8 +201,7 @@ function Signup() {
       } else {
         navigate("/signup");
       }
-      console.log(user);
-      console.log("Profile Photo URL saved to Firestore:", profileURL);
+
       alert("Signup successful!");
     } catch (error) {
       console.error("Signup Error:", error.message);
@@ -230,8 +209,7 @@ function Signup() {
     }
   }
 
-  async function googleSignUp(e) {
-    e.preventDefault();
+  async function googleSignUp() {
     try {
       if (!formData.mobileNumber && !formData.userType) {
         alert("Please fill all required fields");
@@ -244,13 +222,11 @@ function Signup() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Upload custom profile photo if selected
       let profileURL = user.photoURL || "";
       if (formData.profilePhoto) {
         profileURL = await uploadImageToCloudinary(formData.profilePhoto);
       }
 
-      // Save user data to Firestore
       await setDoc(doc(db, "users", user.uid), {
         name: user.displayName || formData.name,
         email: user.email,
@@ -261,36 +237,23 @@ function Signup() {
         profilePhoto: profileURL,
       });
 
-      // Local Storage
-      localStorage.setItem(
-        "userName",
-        user.displayName || formData.name || "User"
-      );
-      localStorage.setItem("userEmail", user.email);
-      localStorage.setItem("userAccessToken", user.uid);
-      localStorage.setItem("userType", formData.userType);
-      localStorage.setItem(
-        "userProfilePhoto",
-        profileURL || user.photoURL || ""
+      dispatch(
+        setUserAuthData({
+          userName: user.displayName || formData.name,
+          userEmail: user.email,
+          userType: formData.userType,
+          userProfilePhoto: profileURL || user.photoURL || "",
+          loginState: true,
+        })
       );
 
-      // // Context state update
-      setUserName(user.displayName || formData.name);
-      setUserEmail(user.email);
-      setUserType(formData.userType);
-      setLoginState(true);
-      setUserProfilePhoto(profileURL || user.photoURL || "");
-
-      // Redirect based on user type
       if (formData.userType === "student") {
-        navigate("/postRequirement:id");
+        navigate("/postRequirement");
       } else if (formData.userType === "mentor") {
         navigate(`/mentorProfileCreate/${user.uid}`);
       }
 
       alert("Google Signup Successful!");
-      console.log("Profile Photo URL saved to Firestore:", profileURL);
-      console.log(user);
     } catch (error) {
       console.error("Google Signup Error:", error.message);
       alert(error.message);
@@ -320,8 +283,12 @@ function Signup() {
                   </label>
                   <img
                     className="w-[70px] h-[70px] mt-2 mb-3 rounded-[50%]"
-                    src={formData.previewPhoto}
-                    alt={formData.previewPhoto}
+                    src={
+                      typeof formData.previewPhoto === "string"
+                        ? formData.previewPhoto
+                        : undefined
+                    }
+                    alt="preview"
                   />
                   <input
                     type="file"
@@ -343,7 +310,7 @@ function Signup() {
                     type="text"
                     id="name"
                     value={formData.name}
-                    onChange={(e) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
                     required
@@ -363,7 +330,7 @@ function Signup() {
                     type="email"
                     id="email"
                     value={formData.email}
-                    onChange={(e) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
                     required
@@ -383,7 +350,7 @@ function Signup() {
                     type="tel"
                     id="mobileNumber"
                     value={formData.mobileNumber}
-                    onChange={(e) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setFormData({ ...formData, mobileNumber: e.target.value })
                     }
                     required
@@ -402,7 +369,7 @@ function Signup() {
                     type={showPass ? "text" : "password"}
                     id="password"
                     value={formData.password}
-                    onChange={(e) =>
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
                     required
@@ -458,7 +425,7 @@ function Signup() {
                       value="mentor"
                       name="userType"
                       checked={formData.userType === "mentor"}
-                      onChange={(e) =>
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setFormData({ ...formData, userType: e.target.value })
                       }
                       className="mr-2"
@@ -475,7 +442,7 @@ function Signup() {
                       value="student"
                       name="userType"
                       checked={formData.userType === "student"}
-                      onChange={(e) =>
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         setFormData({ ...formData, userType: e.target.value })
                       }
                       className="mr-2"
@@ -532,6 +499,6 @@ function Signup() {
       <Footer />
     </div>
   );
-}
+};
 
 export default Signup;

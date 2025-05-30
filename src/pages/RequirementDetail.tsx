@@ -3,11 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { Link, useParams } from "react-router-dom";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../BACKEND/firebase";
-
-function RequirementDetail() {
+import type { RequirementDetail } from "../interfaces/RequirementDetailInterface";
+const RequirementDetail: React.FC = () => {
   const { requirementId } = useParams();
-  const [requirement, setRequirement] = useState(null);
-  const [error, setError] = useState(null);
+  const [requirement, setRequirement] = useState<RequirementDetail | null>(
+    null
+  );
+
+  const [error, setError] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,8 +23,11 @@ function RequirementDetail() {
       doc(db, "requirements", requirementId),
       (docSnap) => {
         if (docSnap.exists()) {
-          setRequirement({ id: docSnap.id, ...docSnap.data() });
-          setError(null);
+          setRequirement({
+            id: docSnap.id,
+            ...(docSnap.data() as Omit<RequirementDetail, "id">),
+          });
+          setError("");
         } else {
           setError("Requirement not found");
           setRequirement(null);
@@ -61,7 +67,7 @@ function RequirementDetail() {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex justify-center items-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-yellow-400 mb-4">{error}</h1>
+          <h1 className="text-2xl font-bold text-yellow-400 mb-6">{error}</h1>
           <Link
             to="/mentorDashboard"
             className="bg-yellow-400 text-gray-900 px-6 py-3 rounded-lg"
@@ -100,20 +106,22 @@ function RequirementDetail() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-white">
-                  {requirement.iWant || "Mentorship Request"}
+                  {(requirement && requirement.iWant) || "Mentorship Request"}
                 </h1>
                 <div className="flex items-center mt-2 gap-3">
                   <span className="bg-blue-900/50 text-blue-400 px-3 py-1 rounded-full text-sm">
-                    {requirement.level || "Level not specified"}
+                    {(requirement && requirement.level) ||
+                      "Level not specified"}
                   </span>
                   <span className="bg-green-900/50 text-green-400 px-3 py-1 rounded-full text-sm">
-                    {requirement.location || "Location not specified"}
+                    {(requirement && requirement.location) ||
+                      "Location not specified"}
                   </span>
                 </div>
               </div>
               <div className="bg-yellow-400 text-gray-900 px-4 py-2 rounded-lg font-bold text-lg">
-                {requirement.budget || "0"}{" "}
-                {requirement.budgetCurrency || "USD"}
+                {(requirement && requirement.budget) || "0"}{" "}
+                {(requirement && requirement.budgetCurrency) || "USD"}
               </div>
             </div>
           </div>
@@ -126,7 +134,8 @@ function RequirementDetail() {
                     Requirement Details
                   </h2>
                   <p className="text-gray-300 whitespace-pre-line">
-                    {requirement.requirementDetails || "No details provided"}
+                    {(requirement && requirement.requirementDetails) ||
+                      "No details provided"}
                   </p>
                 </div>
                 <div>
@@ -134,7 +143,8 @@ function RequirementDetail() {
                     Tutor Location
                   </h2>
                   <p className="text-gray-300 whitespace-pre-line">
-                    {requirement.tutorLocation || "No tutorLocation provided"}
+                    {(requirement && requirement.tutorLocation) ||
+                      "No tutorLocation provided"}
                   </p>
                 </div>
 
@@ -143,7 +153,7 @@ function RequirementDetail() {
                     Subjects Needed
                   </h2>
                   <div className="flex flex-wrap gap-2">
-                    {requirement.subjects?.length > 0 ? (
+                    {requirement && requirement.subjects?.length > 0 ? (
                       requirement.subjects.map((subject, index) => (
                         <span
                           key={index}
@@ -165,7 +175,7 @@ function RequirementDetail() {
                     Languages
                   </h2>
                   <div className="flex flex-wrap gap-2">
-                    {requirement.languages?.length > 0 ? (
+                    {requirement && requirement.languages?.length > 0 ? (
                       requirement.languages.map((language, index) => (
                         <span
                           key={index}
@@ -187,16 +197,16 @@ function RequirementDetail() {
                   </h2>
                   <div className="flex flex-wrap flex-col gap-2">
                     <p>
-                      Online : {requirement.meetingOptions.online}{" "}
-                      {console.log(requirement.meetingOptions.online)}
+                      Online :{" "}
+                      {requirement && requirement.meetingOptions.online}{" "}
                     </p>
                     <p>
-                      AtMyPlace : {requirement.meetingOptions.atMyPlace}{" "}
-                      {console.log(requirement.meetingOptions.atMyPlace)}
+                      AtMyPlace :{" "}
+                      {requirement && requirement.meetingOptions.atMyPlace}{" "}
                     </p>
                     <p>
-                      TravelToTutor : {requirement.meetingOptions.travelToTutor}{" "}
-                      {console.log(requirement.meetingOptions.travelToTutor)}
+                      TravelToTutor :{" "}
+                      {requirement && requirement.meetingOptions.travelToTutor}{" "}
                     </p>
                   </div>
                 </div>
@@ -211,13 +221,15 @@ function RequirementDetail() {
                     <div>
                       <p className="text-sm text-gray-400">Gender Preference</p>
                       <p className="font-medium">
-                        {requirement.genderPreference || "No preference"}
+                        {(requirement && requirement.genderPreference) ||
+                          "No preference"}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-400">Location</p>
                       <p className="font-medium">
-                        {requirement.location || "Not specified"}
+                        {(requirement && requirement.location) ||
+                          "Not specified"}
                       </p>
                     </div>
                   </div>
@@ -250,6 +262,6 @@ function RequirementDetail() {
       </div>
     </div>
   );
-}
+};
 
 export default RequirementDetail;

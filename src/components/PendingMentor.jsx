@@ -1,13 +1,17 @@
-import React from "react";
+import { resetAuthState } from "../reducer/LogingReducer";
 import { signOut } from "firebase/auth";
 import { auth } from "../BACKEND/firebase";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 function PendingMentor() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      dispatch(resetAuthState());
       navigate("/login");
       alert("Logged out successfully!");
     } catch (error) {

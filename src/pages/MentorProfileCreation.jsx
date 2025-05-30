@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { useContext } from "react";
-import { LoginContext } from "../Context/LoginContext.jsx";
+import { useSelector, useDispatch } from "react-redux";
 import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
 import { db, auth } from "../BACKEND/firebase.js";
 import { signOut } from "firebase/auth";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
+import { resetAuthState } from "../reducer/LogingReducer.jsx";
 import Step1BasicInfo from "../components/layout/mentorProfile/Step1BasicInfo.jsx";
 import Step2ExpertiseSkills from "../components/layout/mentorProfile/Step2ExpertiseSkills.jsx";
 import Step3EducationCertifications from "../components/layout/mentorProfile/Step3EducationCertifications.jsx";
@@ -22,9 +22,10 @@ const apiKey = "5eba8f49c8a995e0e09ddd9c";
 
 function MentorProfileCreation() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState(1);
   const { userName, UserProfilePhoto, reapprovalStatus, reapprovalFields } =
-    useContext(LoginContext);
+    useSelector((state) => state.auth);
   const { id } = useParams();
   const isReapproval = reapprovalStatus === "reapproval_pending";
 
@@ -421,6 +422,8 @@ function MentorProfileCreation() {
         });
 
         await updateDoc(mentorRequestRef, updateData);
+        await signOut(auth);
+        dispatch(resetAuthState());
         alert("Profile updated successfully! Awaiting admin approval.");
         navigate("/login");
       } else {
@@ -438,6 +441,7 @@ function MentorProfileCreation() {
           userType: "pendingMentor",
         });
         await signOut(auth);
+        dispatch(resetAuthState());
         alert("Profile submitted! You'll be notified after approval.");
         navigate("/login");
       }

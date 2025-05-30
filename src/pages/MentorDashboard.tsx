@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../BACKEND/firebase";
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
+import { db } from "../BACKEND/firebase.js";
+import Navbar from "../components/layout/Navbar.jsx";
+import Footer from "../components/layout/Footer.jsx";
 import { Link } from "react-router-dom";
 import LocationInput from "../components/Location.jsx";
+import type { Requirement } from "../interfaces/MentorDashBoardInterface.js";
 
-function MentorDashboard() {
-  const [requirements, setRequirements] = useState([]);
-  const [searchRequests, setSearchRequests] = useState("");
+const MentorDashboard: React.FC = () => {
+  const [requirements, setRequirements] = useState<Requirement[]>([]);
+  const [searchRequests, setSearchRequests] = useState<string>("");
+  const [locationFilter, setLocationFilter] = useState<string>("");
 
   useEffect(() => {
     const fetchRequirements = async () => {
@@ -16,7 +18,7 @@ function MentorDashboard() {
         const querySnapshot = await getDocs(collection(db, "requirements"));
         const reqData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data(),
+          ...(doc.data() as Omit<Requirement, "id">),
         }));
         setRequirements(reqData);
       } catch (error) {
@@ -37,6 +39,8 @@ function MentorDashboard() {
     );
   });
 
+  console.log(locationFilter);
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 flex flex-col">
       <header className="sticky top-0 z-50">
@@ -56,16 +60,16 @@ function MentorDashboard() {
                 type="text"
                 value={searchRequests}
                 placeholder="Skills, language..."
-                onChange={(e) => setSearchRequests(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setSearchRequests(e.target.value)
+                }
                 className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
               />
             </div>
             <div>
               <LocationInput
-                value={requirements.location}
-                onChange={(value) =>
-                  setRequirements({ ...requirements, location: value })
-                }
+                value={locationFilter}
+                onChange={(value: string) => setLocationFilter(value)}
               />
             </div>
           </div>
@@ -83,7 +87,7 @@ function MentorDashboard() {
 
                   {/* Skills Tags */}
                   <div className="flex flex-wrap gap-2 mb-3">
-                    {req.subjects.map((skill, index) => (
+                    {req.subjects.map((skill: string, index: number) => (
                       <span
                         key={index}
                         className="bg-amber-900/50 text-amber-400 px-2 py-1 rounded text-xs"
@@ -134,6 +138,6 @@ function MentorDashboard() {
       </footer>
     </div>
   );
-}
+};
 
 export default MentorDashboard;
