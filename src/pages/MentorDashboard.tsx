@@ -87,7 +87,7 @@ const MentorDashboard: React.FC = () => {
 
                   {/* Skills Tags */}
                   <div className="flex flex-wrap gap-2 mb-3">
-                    {req.subjects.map((skill: string, index: number) => (
+                    {req.subjects?.map((skill: string, index: number) => (
                       <span
                         key={index}
                         className="bg-amber-900/50 text-amber-400 px-2 py-1 rounded text-xs"
@@ -99,7 +99,7 @@ const MentorDashboard: React.FC = () => {
 
                   {/* Languages Tags */}
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {req.languages.map((language, index) => (
+                    {req.languages?.map((language, index) => (
                       <span
                         key={index}
                         className="bg-blue-900/50 text-blue-400 px-2 py-1 rounded text-xs"

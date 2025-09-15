@@ -4,11 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { auth } from "../../BACKEND/firebase";
 import { signOut } from "firebase/auth";
-import { resetAuthState } from "../../reducer/LogingReducer"; // Adjust path as needed
+import { resetAuthState } from "../../reducer/LogingReducer";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [showMenu, setShowMenu] = useState<boolean>(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const Navbar = () => {
     reapprovalStatus,
     reapprovalFields,
     reapprovalReason,
-  } = useSelector((state) => state.auth);
+  } = useSelector((state: any) => state.auth);
 
   const handleLogout = async () => {
     try {

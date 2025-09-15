@@ -13,28 +13,26 @@ function MentorProfile() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    const fetchMentorData = async () => {
-      try {
-        const user = auth.currentUser;
-        if (!user) {
-          setError("No user is logged in.");
-          return;
-        }
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const mentorDocRef = doc(db, "mentors", user.uid);
+          const mentorDocSnap = await getDoc(mentorDocRef);
 
-        const mentorDocRef = doc(db, "mentors", user.uid);
-        const mentorDocSnap = await getDoc(mentorDocRef);
-
-        if (mentorDocSnap.exists()) {
-          setMentorData(mentorDocSnap.data());
-        } else {
-          setError("Mentor profile not found.");
+          if (mentorDocSnap.exists()) {
+            setMentorData(mentorDocSnap.data());
+          } else {
+            setError("Mentor profile not found.");
+          }
+        } catch (err) {
+          setError("Failed to fetch mentor data: " + err.message);
         }
-      } catch (err) {
-        setError("Failed to fetch mentor data: " + err.message);
+      } else {
+        setError("No user is logged in.");
       }
-    };
+    });
 
-    fetchMentorData();
+    return () => unsubscribe();
   }, []);
 
   if (error) {

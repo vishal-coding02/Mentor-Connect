@@ -44,6 +44,15 @@ function Login() {
 
       const userData = userSnap.data();
 
+      const mentorReqRef = doc(db, "mentorRequest", user.uid);
+      const mentorReqSnap = await getDoc(mentorReqRef);
+
+      let mentorStatus = "";
+      if (mentorReqSnap.exists()) {
+        const mentorReqData = mentorReqSnap.data();
+        mentorStatus = mentorReqData.status;
+      }
+
       localStorage.setItem("userName", user.displayName || userData.name);
       localStorage.setItem("userEmail", user.email || "");
       localStorage.setItem("userAccessToken", user.uid);
@@ -60,7 +69,7 @@ function Login() {
           userName: user.displayName || userData.name,
           userProfilePhoto: userData.profilePhoto || user.photoURL || "",
           isApproved: userData.isApproved || null,
-          reapprovalStatus: userData.reapprovalStatus || null,
+          reapprovalStatus: mentorStatus || null,
           reapprovalFields: userData.reapprovalFields || [],
           reapprovalReason: userData.reapprovalReason || "",
           loginState: true,
@@ -72,7 +81,7 @@ function Login() {
 
       // Modified Redirect Logic
       if (userData.userType === "pendingMentor") {
-        if (userData.reapprovalStatus === "reapproval_pending") {
+        if (mentorStatus === "reapproval_pending") {
           navigate("/reApproveMentor");
         } else if (
           !userData.isApproved &&
@@ -114,8 +123,16 @@ function Login() {
         navigate("/signup");
         return;
       }
-
       const userData = userSnap.data();
+
+      const mentorReqRef = doc(db, "mentorRequest", user.uid);
+      const mentorReqSnap = await getDoc(mentorReqRef);
+
+      let mentorStatus = "";
+      if (mentorReqSnap.exists()) {
+        const mentorReqData = mentorReqSnap.data();
+        mentorStatus = mentorReqData.status;
+      }
 
       localStorage.setItem("userName", user.displayName || userData.name);
       localStorage.setItem("userEmail", user.email || "");
@@ -141,7 +158,7 @@ function Login() {
 
       // Modified Redirect Logic
       if (userData.userType === "pendingMentor") {
-        if (userData.reapprovalStatus === "reapproval_pending") {
+        if (mentorStatus === "reapproval_pending") {
           navigate("/reApproveMentor");
         } else if (!userData.isApproved) {
           navigate("/pendingMentor");

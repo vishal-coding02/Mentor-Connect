@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 
 const Step8Terms = ({ data, setData }) => {
   return (
@@ -15,7 +15,7 @@ const Step8Terms = ({ data, setData }) => {
             type="checkbox"
             id="terms-checkbox"
             checked={data.agreedToTerms}
-            onChange={(e) =>
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setData({ ...data, agreedToTerms: e.target.checked })
             }
             className="mt-1 h-5 w-5 text-yellow-400 bg-gray-800 border-gray-700 rounded focus:ring-yellow-400 focus:ring-offset-gray-900"
@@ -44,7 +44,7 @@ const Step8Terms = ({ data, setData }) => {
             type="checkbox"
             id="nda-checkbox"
             checked={data.agreedToNDA}
-            onChange={(e) =>
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setData({ ...data, agreedToNDA: e.target.checked })
             }
             className="mt-1 h-5 w-5 text-yellow-400 bg-gray-800 border-gray-700 rounded focus:ring-yellow-400 focus:ring-offset-gray-900"

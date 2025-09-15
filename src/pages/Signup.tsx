@@ -248,7 +248,7 @@ const Signup: React.FC = () => {
       );
 
       if (formData.userType === "student") {
-        navigate("/postRequirement");
+        navigate("/postRequirement:id");
       } else if (formData.userType === "mentor") {
         navigate(`/mentorProfileCreate/${user.uid}`);
       }

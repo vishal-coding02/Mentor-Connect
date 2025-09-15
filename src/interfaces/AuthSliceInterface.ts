@@ -1,7 +1,7 @@
 export interface AuthState {
   loginState: boolean;
   userEmail: string | null;
-  userType: "mentor" | "student" | "admin" | "pendingMentor" | null;
+  userType: string;
   userName: string | null;
   userProfilePhoto: string | null;
   loading: boolean;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 
 const Step6SocialPortfolio = ({ data, setData }) => {
   return (
@@ -8,7 +8,7 @@ const Step6SocialPortfolio = ({ data, setData }) => {
           <span className="text-yellow-400 mr-2">01.</span>
           Social & Portfolio Links
         </h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {/* LinkedIn Profile */}
           <div className="space-y-1">
@@ -22,7 +22,9 @@ const Step6SocialPortfolio = ({ data, setData }) => {
               <input
                 type="text"
                 value={data.linkedin}
-                onChange={(e) => setData({ ...data, linkedin: e.target.value })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setData({ ...data, linkedin: e.target.value })
+                }
                 className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-r-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-gray-500 transition-all"
                 placeholder="your-profile"
               />
@@ -44,14 +46,14 @@ const Step6SocialPortfolio = ({ data, setData }) => {
               <input
                 type="text"
                 value={data.github}
-                onChange={(e) => setData({ ...data, github: e.target.value })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setData({ ...data, github: e.target.value })
+                }
                 className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-r-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-gray-500 transition-all"
                 placeholder="your-username"
               />
             </div>
-            <p className="text-xs text-gray-500">
-              Your GitHub username
-            </p>
+            <p className="text-xs text-gray-500">Your GitHub username</p>
           </div>
 
           {/* Portfolio Website */}
@@ -62,13 +64,13 @@ const Step6SocialPortfolio = ({ data, setData }) => {
             <input
               type="url"
               value={data.portfolio}
-              onChange={(e) => setData({ ...data, portfolio: e.target.value })}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setData({ ...data, portfolio: e.target.value })
+              }
               className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-gray-500 transition-all"
               placeholder="https://your-portfolio.com"
             />
-            <p className="text-xs text-gray-500">
-              Full URL to your portfolio
-            </p>
+            <p className="text-xs text-gray-500">Full URL to your portfolio</p>
           </div>
 
           {/* YouTube Channel */}
@@ -83,14 +85,14 @@ const Step6SocialPortfolio = ({ data, setData }) => {
               <input
                 type="text"
                 value={data.youtube}
-                onChange={(e) => setData({ ...data, youtube: e.target.value })}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setData({ ...data, youtube: e.target.value })
+                }
                 className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-r-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-gray-500 transition-all"
                 placeholder="channel/your-channel"
               />
             </div>
-            <p className="text-xs text-gray-500">
-              Your YouTube channel path
-            </p>
+            <p className="text-xs text-gray-500">Your YouTube channel path</p>
           </div>
         </div>
       </div>

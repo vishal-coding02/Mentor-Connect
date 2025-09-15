@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 
 const Step4Availability = ({
   data,
@@ -24,7 +24,9 @@ const Step4Availability = ({
           </label>
           <select
             value={data.timeZone}
-            onChange={(e) => setData({ ...data, timeZone: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+              setData({ ...data, timeZone: e.target.value })
+            }
             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white transition-all"
             required
           >
@@ -56,13 +58,13 @@ const Step4Availability = ({
             Select your available days
           </label>
           <div className="flex flex-wrap gap-2">
-            {days.map((day) => (
+            {days.map((day: string) => (
               <button
                 key={day}
                 type="button"
                 onClick={() => {
                   const newDays = data.preferredDays.includes(day)
-                    ? data.preferredDays.filter((d) => d !== day)
+                    ? data.preferredDays.filter((d: string) => d !== day)
                     : [...data.preferredDays, day];
                   setData({ ...data, preferredDays: newDays });
                 }}
@@ -98,12 +100,12 @@ const Step4Availability = ({
                 </label>
                 <select
                   value={newSlot.day}
-                  onChange={(e) =>
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                     setNewSlot({ ...newSlot, day: e.target.value })
                   }
                   className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm text-white transition-all"
                 >
-                  {days.map((day) => (
+                  {days.map((day: string) => (
                     <option key={day} value={day}>
                       {day}
                     </option>
@@ -118,7 +120,7 @@ const Step4Availability = ({
                 <input
                   type="time"
                   value={newSlot.startTime}
-                  onChange={(e) =>
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     setNewSlot({ ...newSlot, startTime: e.target.value })
                   }
                   className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm text-white transition-all"
@@ -132,7 +134,7 @@ const Step4Availability = ({
                 <input
                   type="time"
                   value={newSlot.endTime}
-                  onChange={(e) =>
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     setNewSlot({ ...newSlot, endTime: e.target.value })
                   }
                   className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-sm text-white transition-all"
@@ -160,7 +162,7 @@ const Step4Availability = ({
                 Your Scheduled Availability:
               </h4>
               <div className="bg-gray-800 border border-gray-700 rounded-lg p-3 divide-y divide-gray-700">
-                {data.timeSlots.map((slot, index) => (
+                {data.timeSlots.map((slot: any, index: number) => (
                   <div
                     key={index}
                     className="flex justify-between items-center py-2"

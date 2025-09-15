@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 
 const Step3EducationCertifications = ({
   data,
@@ -17,7 +17,7 @@ const Step3EducationCertifications = ({
           <span className="text-yellow-400 mr-2">01.</span>
           Education Background
         </h3>
-        
+
         <div className="space-y-1">
           <label className="block text-sm font-medium text-gray-300">
             Highest Qualification
@@ -25,7 +25,9 @@ const Step3EducationCertifications = ({
           <input
             type="text"
             value={data.highestQualification}
-            onChange={(e) => setData({ ...data, highestQualification: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setData({ ...data, highestQualification: e.target.value })
+            }
             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-gray-500 transition-all"
             placeholder="e.g. Master's in Computer Science"
             required
@@ -42,7 +44,7 @@ const Step3EducationCertifications = ({
           <span className="text-yellow-400 mr-2">02.</span>
           Professional Certifications
         </h3>
-        
+
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-300">
             Add Certifications
@@ -51,10 +53,14 @@ const Step3EducationCertifications = ({
             <input
               type="text"
               value={newCertification}
-              onChange={(e) => setNewCertification(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setNewCertification(e.target.value)
+              }
               className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-gray-500 transition-all"
               placeholder="e.g. AWS Certified Solutions Architect"
-              onKeyPress={(e) => e.key === "Enter" && addCertification()}
+              onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) =>
+                e.key === "Enter" && addCertification()
+              }
             />
             <button
               type="button"
@@ -64,9 +70,9 @@ const Step3EducationCertifications = ({
               Add
             </button>
           </div>
-          
+
           <div className="space-y-2 mt-2">
-            {data.certifications.map((cert, index) => (
+            {data.certifications.map((cert: string, index: number) => (
               <div
                 key={index}
                 className="flex items-center justify-between bg-gray-800 border border-gray-700 px-3 py-2 rounded-lg"
@@ -83,7 +89,7 @@ const Step3EducationCertifications = ({
               </div>
             ))}
           </div>
-          
+
           <p className="text-xs text-gray-500">
             Add relevant professional certifications to boost your profile
           </p>
@@ -96,7 +102,7 @@ const Step3EducationCertifications = ({
           <span className="text-yellow-400 mr-2">03.</span>
           Professional Resume
         </h3>
-        
+
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-300">
             Upload Resume (Optional)
@@ -121,10 +127,12 @@ const Step3EducationCertifications = ({
                   <span className="text-sm text-white">Resume uploaded</span>
                 </>
               ) : (
-                <span className="text-sm text-gray-400">No resume uploaded</span>
+                <span className="text-sm text-gray-400">
+                  No resume uploaded
+                </span>
               )}
             </div>
-            
+
             <label className="cursor-pointer">
               <span className="inline-block px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium text-white transition-colors border border-gray-700">
                 {data.resume ? "Change Resume" : "Upload Resume"}
@@ -137,7 +145,7 @@ const Step3EducationCertifications = ({
               />
             </label>
           </div>
-          
+
           <p className="text-xs text-gray-500">
             Accepted formats: PDF, DOC, DOCX (Max 5MB)
           </p>
