@@ -2,22 +2,23 @@ import { Link, useParams } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import ReApprovalEmail from "../Services/ReApprovalEmail";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { db } from "../BACKEND/firebase";
 import { getDoc, Timestamp } from "firebase/firestore";
 import { updateDoc, doc, serverTimestamp } from "firebase/firestore";
 import { auth } from "../BACKEND/firebase"; // admin ka auth
+import type { MergedData } from "../interfaces/VMDInterface";
 
-function ViewMentorDetails() {
+const ViewMentorDetails: React.FC = () => {
   const { id } = useParams();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [changesNeeded, setChangesNeeded] = useState("");
-  const [fieldsToChange, setFieldsToChange] = useState([]); // naya
-  const [mentor, setMentor] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [changesNeeded, setChangesNeeded] = useState<string>("");
+  const [fieldsToChange, setFieldsToChange] = useState<string[]>([]); 
+  const [mentor, setMentor] = useState<MergedData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
 
-  function formatTimeTo12Hour(timeString) {
+  function formatTimeTo12Hour(timeString: string) {
     const [hours, minutes] = timeString.split(":");
     const hour = parseInt(hours, 10);
     const ampm = hour >= 12 ? "PM" : "AM";
@@ -25,7 +26,7 @@ function ViewMentorDetails() {
     return `${formattedHour}:${minutes} ${ampm}`;
   }
 
-  const availableFields = [
+  const availableFields: string[] = [
     "profilePicture",
     "professionalTitle",
     "bio",
@@ -56,6 +57,10 @@ function ViewMentorDetails() {
     const fetchMentorData = async () => {
       try {
         setLoading(true);
+        if (!id) {
+          console.error("Mentor ID is undefined");
+          return;
+        }
         const userDoc = await getDoc(doc(db, "users", id));
         const mentorReqDoc = await getDoc(doc(db, "mentorRequest", id));
 
@@ -66,7 +71,7 @@ function ViewMentorDetails() {
         const userData = userDoc.data();
         const mentorData = mentorReqDoc.data();
 
-        const mergedData = {
+        const mergedData: MergedData = {
           id,
           name: userData.name || "N/A",
           email: userData.email || "N/A",
@@ -121,7 +126,11 @@ function ViewMentorDetails() {
       return;
     }
 
-    const adminId = auth.currentUser.uid;
+    const adminId = auth.currentUser?.uid;
+    if (!id) {
+      console.error("Mentor ID is undefined");
+      return;
+    }
     const mentorRequestRef = doc(db, "mentorRequest", id);
 
     try {
@@ -135,10 +144,17 @@ function ViewMentorDetails() {
       });
 
       // Prepare Update Link
-      const updateLink = `${import.meta.env.VITE_REACT_APP_BASE_URL}/mentorProfileCreate/${id}`;
+      const updateLink = `${
+        import.meta.env.VITE_REACT_APP_BASE_URL
+      }/mentorProfileCreate/${id}`;
       console.log("Sending updateLink:", updateLink);
 
       // Send Re-Approval Email
+      if (!mentor) {
+        alert("Mentor data not loaded yet.");
+        return;
+      }
+
       await ReApprovalEmail(
         mentor.email,
         mentor.fullName,
@@ -1026,11 +1042,11 @@ function ViewMentorDetails() {
                       type="checkbox"
                       value={field}
                       checked={fieldsToChange.includes(field)}
-                      onChange={(e) => {
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => {
                         const value = e.target.value;
-                        setFieldsToChange((prev) =>
+                        setFieldsToChange((prev: any) =>
                           prev.includes(value)
-                            ? prev.filter((item) => item !== value)
+                            ? prev.filter((item: any) => item !== value)
                             : [...prev, value]
                         );
                       }}
@@ -1045,7 +1061,9 @@ function ViewMentorDetails() {
               className="w-full h-32 p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:outline-none focus:border-yellow-400 resize-none"
               placeholder="Enter changes needed..."
               value={changesNeeded}
-              onChange={(e) => setChangesNeeded(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                setChangesNeeded(e.target.value)
+              }
             />
             <div className="flex justify-end gap-4 mt-6">
               <button
@@ -1068,6 +1086,6 @@ function ViewMentorDetails() {
       <Footer />
     </div>
   );
-}
+};
 
 export default ViewMentorDetails;

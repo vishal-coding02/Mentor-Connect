@@ -9,12 +9,6 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 
 const StudentHomePage = () => {
-  const userRedux = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    console.log("Redux login state: ", userRedux);
-  }, [userRedux]);
-
   return (
     <div>
       <Navbar />

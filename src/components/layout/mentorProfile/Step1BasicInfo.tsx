@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 
 const Step1BasicInfo = ({ data, setData, handleFileUpload }) => {
   return (
@@ -18,7 +18,9 @@ const Step1BasicInfo = ({ data, setData, handleFileUpload }) => {
             <input
               type="text"
               value={data.fullName}
-              onChange={(e) => setData({ ...data, fullName: e.target.value })}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setData({ ...data, fullName: e.target.value })
+              }
               className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-gray-500 transition-all"
               required
               placeholder="John Doe"
@@ -32,7 +34,7 @@ const Step1BasicInfo = ({ data, setData, handleFileUpload }) => {
             <input
               type="text"
               value={data.professionalTitle}
-              onChange={(e) =>
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setData({ ...data, professionalTitle: e.target.value })
               }
               className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-gray-500 transition-all"
@@ -88,7 +90,9 @@ const Step1BasicInfo = ({ data, setData, handleFileUpload }) => {
                 type="file"
                 className="hidden"
                 accept="image/*"
-                onChange={(e) => handleFileUpload(e, "profilePicture")}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  handleFileUpload(e, "profilePicture")
+                }
               />
             </label>
             <p className="text-xs text-gray-500 pt-3">
@@ -111,7 +115,9 @@ const Step1BasicInfo = ({ data, setData, handleFileUpload }) => {
           </label>
           <textarea
             value={data.bio}
-            onChange={(e) => setData({ ...data, bio: e.target.value })}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+              setData({ ...data, bio: e.target.value })
+            }
             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-gray-500 transition-all"
             rows={5}
             placeholder="Describe your professional background, skills, and expertise..."

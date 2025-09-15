@@ -1,40 +1,38 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { auth } from "../BACKEND/firebase";
 import { db } from "../BACKEND/firebase";
 import { useNavigate } from "react-router-dom";
 import { getDoc, doc } from "firebase/firestore";
-import { useContext } from "react";
-import { LoginContext } from "../Context/LoginContext";
+import { useSelector } from "react-redux";
 function MentorProfile() {
   const [mentorData, setMentorData] = useState(null);
   const [error, setError] = useState(null);
-  const { userType } = useContext(LoginContext);
+  const { userType } = useSelector((state) => state.auth);
+
   const navigate = useNavigate();
   useEffect(() => {
-    const fetchMentorData = async () => {
-      try {
-        const user = auth.currentUser;
-        if (!user) {
-          setError("No user is logged in.");
-          return;
-        }
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const mentorDocRef = doc(db, "mentors", user.uid);
+          const mentorDocSnap = await getDoc(mentorDocRef);
 
-        const mentorDocRef = doc(db, "mentors", user.uid);
-        const mentorDocSnap = await getDoc(mentorDocRef);
-
-        if (mentorDocSnap.exists()) {
-          setMentorData(mentorDocSnap.data());
-        } else {
-          setError("Mentor profile not found.");
+          if (mentorDocSnap.exists()) {
+            setMentorData(mentorDocSnap.data());
+          } else {
+            setError("Mentor profile not found.");
+          }
+        } catch (err) {
+          setError("Failed to fetch mentor data: " + err.message);
         }
-      } catch (err) {
-        setError("Failed to fetch mentor data: " + err.message);
+      } else {
+        setError("No user is logged in.");
       }
-    };
+    });
 
-    fetchMentorData();
+    return () => unsubscribe();
   }, []);
 
   if (error) {

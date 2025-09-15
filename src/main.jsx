@@ -1,6 +1,5 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { LoginProvider } from "./Context/LoginContext";
 import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import Login from "./pages/LoginPage";
@@ -23,6 +22,7 @@ import { Provider } from "react-redux";
 import store from "./Store";
 import UnlockContact from "./components/UnlockContact";
 import BuyCoins from "./pages/BuyCoins";
+import AuthLoader from "./components/AuthLoader";
 
 const router = createBrowserRouter([
   {
@@ -107,9 +107,8 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
-      <LoginProvider>
-        <RouterProvider router={router} />
-      </LoginProvider>
+      <AuthLoader />
+      <RouterProvider router={router} />
     </Provider>
   </StrictMode>
 );

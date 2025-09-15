@@ -1,7 +1,7 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 
 const Step5Pricing = ({ data, setData, currencies, currencySymbols }) => {
-  const durations = ["30", "45", "60", "90", "120"];
+  const durations: string[] = ["30", "45", "60", "90", "120"];
 
   return (
     <div className="bg-gray-900 rounded-lg shadow-xl animate-fade-in border border-gray-800">
@@ -24,7 +24,7 @@ const Step5Pricing = ({ data, setData, currencies, currencySymbols }) => {
               <input
                 type="number"
                 value={data.sessionPrice}
-                onChange={(e) =>
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setData({ ...data, sessionPrice: e.target.value })
                 }
                 className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-r-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-gray-500 transition-all"
@@ -44,11 +44,13 @@ const Step5Pricing = ({ data, setData, currencies, currencySymbols }) => {
             </label>
             <select
               value={data.currency}
-              onChange={(e) => setData({ ...data, currency: e.target.value })}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                setData({ ...data, currency: e.target.value })
+              }
               className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white transition-all"
               required
             >
-              {currencies.map((currency) => (
+              {currencies.map((currency: string) => (
                 <option key={currency} value={currency} className="bg-gray-800">
                   {currency} ({currencySymbols[currency] || currency})
                 </option>
@@ -62,13 +64,13 @@ const Step5Pricing = ({ data, setData, currencies, currencySymbols }) => {
             </label>
             <select
               value={data.sessionDuration}
-              onChange={(e) =>
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                 setData({ ...data, sessionDuration: e.target.value })
               }
               className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white transition-all"
               required
             >
-              {durations.map((duration) => (
+              {durations.map((duration: string) => (
                 <option key={duration} value={duration} className="bg-gray-800">
                   {duration} minutes
                 </option>

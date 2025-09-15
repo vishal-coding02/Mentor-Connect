@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const GEOAPIFY_API_KEY = "577d204d102444dcb3b814c90abb389e"; // replace with your key
+const GEOAPIFY_API_KEY = "577d204d102444dcb3b814c90abb389e";
 
 function LocationInput({ value, onChange }) {
   const [suggestions, setSuggestions] = useState([]);

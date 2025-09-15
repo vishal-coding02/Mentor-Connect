@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import { useNavigate } from "react-router-dom";
+import type { InitialMentors } from "../interfaces/FindMentorInterFace";
 
-const initialMentors = [
+const initialMentors: InitialMentors[] = [
   {
     id: 1,
     name: "Sarah Johnson",
@@ -11,7 +12,7 @@ const initialMentors = [
     experience: "10+ years",
     skills: ["React", "Node.js", "JavaScript"],
     pricing: "50 Coins / Hour",
-    rating: 4.5,
+    rating: "4.5",
     languages: ["English"],
     teachingStyle: ["Hands-on"],
   },
@@ -22,7 +23,7 @@ const initialMentors = [
     experience: "7 years",
     skills: ["Python", "Django", "SQL"],
     pricing: "40 Coins / Hour",
-    rating: 4.8,
+    rating: "4.8",
     languages: ["Hindi"],
     teachingStyle: ["Project-based"],
   },
@@ -52,8 +53,8 @@ const initialMentors = [
 
 function FindMentors() {
   const navigate = useNavigate();
-  const [searchMentor, setSearchMentor] = useState("");
-  const [mentors, setMentors] = useState(initialMentors);
+  const [searchMentor, setSearchMentor] = useState<string>("");
+  const [mentors, setMentors] = useState<InitialMentors[]>(initialMentors);
 
   useEffect(() => {
     if (!searchMentor.trim()) {
@@ -102,7 +103,9 @@ function FindMentors() {
                 value={searchMentor}
                 className="w-full px-4 sm:px-5 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition duration-300 placeholder-gray-500"
                 placeholder="Search mentors by name, skills, or keywords..."
-                onChange={(e) => setSearchMentor(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setSearchMentor(e.target.value)
+                }
               />
             </div>
           </div>

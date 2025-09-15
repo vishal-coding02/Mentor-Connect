@@ -1,56 +1,29 @@
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import Navbar from "../components/layout/Navbar.jsx";
+import Footer from "../components/layout/Footer.jsx";
+import { ChangeEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { auth, db } from "../BACKEND/firebase.js";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
-import { LoginContext } from "../Context/LoginContext.jsx";
-import { login } from "../reducer/LogingReducer.jsx";
 import { useDispatch } from "react-redux";
+import { setUserAuthData } from "../reducer/LogingReducer.jsx";
+import type { LoginForm } from "../interfaces/LoginInterface";
 
 function Login() {
   const navigate = useNavigate();
-  const [showPass, setShowPass] = useState(null);
   const dispatch = useDispatch();
-  const {
-    setLoginState,
-    setUserEmail,
-    setUserName,
-    setUserType,
-    setUserProfilePhoto,
-    userType,
-    reapprovalStatus,
-    isApproved,
-  } = useContext(LoginContext);
-  const [signIn, setSignIn] = useState({
+
+  const [showPass, setShowPass] = useState<boolean>(false);
+  const [signIn, setSignIn] = useState<LoginForm>({
     userEmail: "",
     userPassword: "",
   });
 
-  useEffect(() => {
-    if (
-      userType === "pendingMentor" &&
-      reapprovalStatus === "reapproval_pending"
-    ) {
-      navigate("/reApproveMentor");
-    }
-  }, [userType, reapprovalStatus, navigate]);
-
-  useEffect(() => {
-    if (
-      userType === "pendingMentor" &&
-      isApproved !== true &&
-      reapprovalStatus !== "reapproval_pending"
-    ) {
-      navigate("/pendingMentor");
-    }
-  }, [userType, reapprovalStatus, navigate, isApproved]);
-
-  async function handleSignIn(e) {
+  async function handleSignIn(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -60,7 +33,6 @@ function Login() {
       );
       const user = userCredential.user;
 
-      // Firestore se user ka data lana
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
@@ -72,9 +44,17 @@ function Login() {
 
       const userData = userSnap.data();
 
-      // localStorage
+      const mentorReqRef = doc(db, "mentorRequest", user.uid);
+      const mentorReqSnap = await getDoc(mentorReqRef);
+
+      let mentorStatus = "";
+      if (mentorReqSnap.exists()) {
+        const mentorReqData = mentorReqSnap.data();
+        mentorStatus = mentorReqData.status;
+      }
+
       localStorage.setItem("userName", user.displayName || userData.name);
-      localStorage.setItem("userEmail", user.email);
+      localStorage.setItem("userEmail", user.email || "");
       localStorage.setItem("userAccessToken", user.uid);
       localStorage.setItem("userType", userData.userType);
       localStorage.setItem(
@@ -82,32 +62,35 @@ function Login() {
         userData.profilePhoto || user.photoURL || ""
       );
 
-      // Context state update
-      setUserName(user.displayName || userData.name);
-      setUserEmail(user.email);
-      setUserType(userData.userType);
-      setUserProfilePhoto(userData.profilePhoto || user.photoURL || "");
-      setLoginState(true);
-
       dispatch(
-        login({
+        setUserAuthData({
           userEmail: user.email,
           userType: userData.userType,
           userName: user.displayName || userData.name,
           userProfilePhoto: userData.profilePhoto || user.photoURL || "",
           isApproved: userData.isApproved || null,
-          reapprovalStatus: userData.reapprovalStatus || null,
+          reapprovalStatus: mentorStatus || null,
           reapprovalFields: userData.reapprovalFields || [],
           reapprovalReason: userData.reapprovalReason || "",
+          loginState: true,
         })
       );
 
       alert("User Logged In Successfully!");
-      console.log("Firestore Data:", userData);
+      console.log(userData);
 
-      // Navigate based on userType
-      if (userData.userType === "mentor") {
-        navigate(`/mentorDashboard`);
+      // Modified Redirect Logic
+      if (userData.userType === "pendingMentor") {
+        if (mentorStatus === "reapproval_pending") {
+          navigate("/reApproveMentor");
+        } else if (
+          !userData.isApproved &&
+          userData.userType === "pendingMentor"
+        ) {
+          navigate("/pendingMentor");
+        }
+      } else if (userData.userType === "mentor") {
+        navigate("/mentorDashboard");
       } else if (userData.userType === "student") {
         navigate("/postRequirement:id");
       } else if (userData.userType === "admin") {
@@ -118,7 +101,6 @@ function Login() {
       alert("Login Failed: " + error.message);
     }
 
-    // Reset form fields
     setSignIn({
       userEmail: "",
       userPassword: "",
@@ -133,7 +115,6 @@ function Login() {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Check if user exists in Firestore
       const userDocRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userDocRef);
 
@@ -142,40 +123,48 @@ function Login() {
         navigate("/signup");
         return;
       }
-
       const userData = userSnap.data();
 
-      // localStorage
+      const mentorReqRef = doc(db, "mentorRequest", user.uid);
+      const mentorReqSnap = await getDoc(mentorReqRef);
+
+      let mentorStatus = "";
+      if (mentorReqSnap.exists()) {
+        const mentorReqData = mentorReqSnap.data();
+        mentorStatus = mentorReqData.status;
+      }
+
       localStorage.setItem("userName", user.displayName || userData.name);
-      localStorage.setItem("userEmail", user.email);
+      localStorage.setItem("userEmail", user.email || "");
       localStorage.setItem("userAccessToken", user.uid);
       localStorage.setItem("userType", userData.userType);
       localStorage.setItem(
         "userProfilePhoto",
         userData.profilePhoto || user.photoURL || ""
       );
-      // Context state update
-      setUserName(user.displayName || userData.name);
-      setUserEmail(user.email);
-      setUserType(userData.userType);
-      setUserProfilePhoto(userData.profilePhoto || user.photoURL || "");
-      setLoginState(true);
 
       dispatch(
-        login({
+        setUserAuthData({
           userEmail: user.email,
           userType: userData.userType,
           userName: user.displayName || userData.name,
           userProfilePhoto: userData.profilePhoto || user.photoURL || "",
+          loginState: true,
         })
       );
 
       alert("Login successful!");
-      console.log("Firestore Data:", userData);
+      console.log(userData);
 
-      // Navigate based on userType
-      if (userData.userType === "mentor") {
-        navigate(`/mentorDashboard`);
+      // Modified Redirect Logic
+      if (userData.userType === "pendingMentor") {
+        if (mentorStatus === "reapproval_pending") {
+          navigate("/reApproveMentor");
+        } else if (!userData.isApproved) {
+          navigate("/pendingMentor");
+        }
+      } else if (userData.userType === "mentor") {
+        navigate("/mentorDashboard");
       } else if (userData.userType === "student") {
         navigate("/postRequirement:id");
       } else if (userData.userType === "admin") {
@@ -189,10 +178,7 @@ function Login() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 font-sans">
-      {/* Header */}
       <Navbar />
-
-      {/* Login Section */}
       <section className="bg-gradient-to-br from-gray-800 via-gray-900 to-blue-900 pt-24 pb-20 min-h-screen flex items-center">
         <div className="container mx-auto px-6">
           <div className="max-w-md mx-auto bg-gray-800 p-8 rounded-xl shadow-lg">
@@ -200,7 +186,6 @@ function Login() {
               Welcome Back
             </h2>
 
-            {/* User Type Selection */}
             <div className="mb-6">
               <label className="block text-gray-300 mb-2 text-xl text-center">
                 Log in
@@ -208,7 +193,6 @@ function Login() {
             </div>
 
             <form className="space-y-6" onSubmit={handleSignIn}>
-              {/* Email Field */}
               <div>
                 <label className="block text-gray-300 mb-2">Email</label>
                 <input
@@ -216,7 +200,7 @@ function Login() {
                   id="email"
                   value={signIn.userEmail}
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-yellow-400 transition duration-300"
-                  onChange={(e) => {
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     setSignIn({ ...signIn, userEmail: e.target.value });
                   }}
                   placeholder="Enter your email"
@@ -224,7 +208,6 @@ function Login() {
                 />
               </div>
 
-              {/* Password Field */}
               <div className="relative">
                 <label htmlFor="password" className="block text-gray-300 mb-2">
                   Password
@@ -234,7 +217,7 @@ function Login() {
                   id="password"
                   value={signIn.userPassword}
                   className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-yellow-400 transition duration-300"
-                  onChange={(e) => {
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     setSignIn({ ...signIn, userPassword: e.target.value });
                   }}
                   placeholder="Enter your password"
@@ -250,7 +233,6 @@ function Login() {
                 )}
               </div>
 
-              {/* Forgot Password Link */}
               <div className="text-right">
                 <a
                   href="#"
@@ -260,7 +242,6 @@ function Login() {
                 </a>
               </div>
 
-              {/* Continue with Google */}
               <div className="mt-6">
                 <p className="block text-gray-300 mb-2">Continue with Google</p>
                 <button
@@ -271,7 +252,6 @@ function Login() {
                 </button>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 className="w-full bg-yellow-400 text-gray-900 cursor-pointer px-8 py-3 rounded-lg font-semibold shadow-lg hover:bg-yellow-500 transform hover:scale-105 transition duration-300"
@@ -280,7 +260,6 @@ function Login() {
               </button>
             </form>
 
-            {/* Signup Link */}
             <p className="text-center text-gray-400 mt-6">
               Don't have an account?{" "}
               <Link
@@ -293,8 +272,6 @@ function Login() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
       <Footer />
     </div>
   );

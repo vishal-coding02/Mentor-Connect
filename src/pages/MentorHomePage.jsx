@@ -2,10 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
-import { useContext } from "react";
-import { LoginContext } from "../Context/LoginContext.jsx";
+import { useSelector } from "react-redux";
 const MentorHome = () => {
-  const { userName } = useContext(LoginContext);
+  const { userName } = useSelector((state) => state.auth);
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 font-sans">

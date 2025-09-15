@@ -1,0 +1,36 @@
+export interface MergedData {
+  id: string | undefined;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  mobileNumber: string;
+  profilePhoto: string;
+  userType: string;
+  createdAt: string[];
+  fullName: string;
+  professionalTitle: string;
+  bio: string;
+  skills: string[];
+  primaryCategory: string;
+  experienceLevel: string;
+  yearsOfExperience: string;
+  highestQualification: string;
+  certifications: string[];
+  resume: string;
+  timeSlots: any[];
+  preferredDays: string[];
+  timeZone: string;
+  sessionPrice: string;
+  currency: string;
+  sessionDuration: string;
+  linkedin: string;
+  github: string;
+  portfolio: string;
+  youtube: string;
+  demoVideo: string;
+  experience: string;
+  teachingStyle: string;
+  languages: string[];
+  agreedToTerms: boolean;
+  agreedToNDA: boolean;
+}

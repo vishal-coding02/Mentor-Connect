@@ -8,9 +8,9 @@ const Step9Preview = ({ data, currencySymbols }) => {
       items: [
         { label: "Name", value: data.fullName },
         { label: "Title", value: data.professionalTitle },
-        { label: "Bio", value: data.bio }
+        { label: "Bio", value: data.bio },
       ],
-      image: data.profilePicture
+      image: data.profilePicture,
     },
     {
       title: "Expertise & Skills",
@@ -19,76 +19,90 @@ const Step9Preview = ({ data, currencySymbols }) => {
         { label: "Category", value: data.primaryCategory },
         { label: "Experience Level", value: data.experienceLevel },
         { label: "Years of Experience", value: data.yearsOfExperience },
-        { 
-          label: "Skills", 
+        {
+          label: "Skills",
           value: data.skills.length > 0 ? data.skills.join(", ") : null,
-          isList: true
-        }
-      ]
+          isList: true,
+        },
+      ],
     },
     {
       title: "Education & Certifications",
       icon: "🎓",
       items: [
         { label: "Highest Qualification", value: data.highestQualification },
-        { 
-          label: "Certifications", 
-          value: data.certifications.length > 0 ? data.certifications.join(", ") : null,
-          isList: true
-        }
-      ]
+        {
+          label: "Certifications",
+          value:
+            data.certifications.length > 0
+              ? data.certifications.join(", ")
+              : null,
+          isList: true,
+        },
+      ],
     },
     {
       title: "Availability",
       icon: "⏰",
       items: [
         { label: "Time Zone", value: data.timeZone },
-        { 
-          label: "Preferred Days", 
-          value: data.preferredDays.length > 0 ? data.preferredDays.join(", ") : null 
+        {
+          label: "Preferred Days",
+          value:
+            data.preferredDays.length > 0
+              ? data.preferredDays.join(", ")
+              : null,
         },
-        { 
-          label: "Time Slots", 
-          value: data.timeSlots.length > 0 ? 
-            data.timeSlots.map(slot => `${slot.day}: ${slot.startTime}-${slot.endTime}`).join("; ") : null
-        }
-      ]
+        {
+          label: "Time Slots",
+          value:
+            data.timeSlots.length > 0
+              ? data.timeSlots
+                  .map(
+                    (slot) => `${slot.day}: ${slot.startTime}-${slot.endTime}`
+                  )
+                  .join("; ")
+              : null,
+        },
+      ],
     },
     {
       title: "Pricing",
       icon: "💰",
       items: [
-        { 
-          label: "Session Rate", 
-          value: `${currencySymbols[data.currency] || data.currency}${data.sessionPrice || "0"} per ${data.sessionDuration || "60"} minutes`
-        }
-      ]
+        {
+          label: "Session Rate",
+          value: `${currencySymbols[data.currency] || data.currency}${
+            data.sessionPrice || "0"
+          } per ${data.sessionDuration || "60"} minutes`,
+        },
+      ],
     },
     {
       title: "Social & Portfolio",
       icon: "🔗",
       items: [
-        { 
-          label: "LinkedIn", 
+        {
+          label: "LinkedIn",
           value: data.linkedin ? `linkedin.com/in/${data.linkedin}` : null,
-          isLink: true 
+          isLink: true,
         },
-        { 
-          label: "GitHub", 
+        {
+          label: "GitHub",
           value: data.github ? `github.com/${data.github}` : null,
-          isLink: true 
+          isLink: true,
         },
-        { 
-          label: "Portfolio", 
+        {
+          label: "Portfolio",
           value: data.portfolio,
-          isLink: true 
+          isLink: true,
         },
-        { 
-          label: "YouTube", 
+        {
+          label: "YouTube",
           value: data.youtube ? `youtube.com/${data.youtube}` : null,
-          isLink: true 
-        }
-      ]
+          isLink: true,
+        },
+      ],
     },
     {
       title: "Teaching Details",
@@ -96,13 +110,13 @@ const Step9Preview = ({ data, currencySymbols }) => {
       items: [
         { label: "Experience", value: data.experience },
         { label: "Teaching Style", value: data.teachingStyle },
-        { 
-          label: "Languages", 
+        {
+          label: "Languages",
           value: data.languages.length > 0 ? data.languages.join(", ") : null,
-          isList: true
-        }
-      ]
-    }
+          isList: true,
+        },
+      ],
+    },
   ];
 
   return (
@@ -119,7 +133,7 @@ const Step9Preview = ({ data, currencySymbols }) => {
 
       <div className="p-6 space-y-8">
         {sections.map((section, index) => (
-          <div 
+          <div
             key={index}
             className="bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden"
           >
@@ -129,7 +143,7 @@ const Step9Preview = ({ data, currencySymbols }) => {
                 {section.title}
               </h4>
             </div>
-            
+
             <div className="p-4">
               {section.image && (
                 <div className="flex justify-center mb-4">
@@ -140,7 +154,7 @@ const Step9Preview = ({ data, currencySymbols }) => {
                   />
                 </div>
               )}
-              
+
               <div className="space-y-3">
                 {section.items.map((item, idx) => (
                   <div key={idx} className="flex flex-col sm:flex-row">
@@ -152,8 +166,12 @@ const Step9Preview = ({ data, currencySymbols }) => {
                         <span className="text-gray-500">Not provided</span>
                       )}
                       {item.isLink && item.value && (
-                        <a 
-                          href={item.value.startsWith('http') ? item.value : `https://${item.value}`}
+                        <a
+                          href={
+                            item.value.startsWith("http")
+                              ? item.value
+                              : `https://${item.value}`
+                          }
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-yellow-400 hover:underline ml-1"

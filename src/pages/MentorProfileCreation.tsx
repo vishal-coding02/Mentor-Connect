@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { useContext } from "react";
-import { LoginContext } from "../Context/LoginContext.jsx";
+import { useSelector, useDispatch } from "react-redux";
 import { doc, setDoc, updateDoc, getDoc } from "firebase/firestore";
 import { db, auth } from "../BACKEND/firebase.js";
 import { signOut } from "firebase/auth";
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
-import Step1BasicInfo from "../components/layout/mentorProfile/Step1BasicInfo.jsx";
-import Step2ExpertiseSkills from "../components/layout/mentorProfile/Step2ExpertiseSkills.jsx";
+import Navbar from "../components/layout/Navbar.jsx";
+import Footer from "../components/layout/Footer.jsx";
+import { resetAuthState } from "../reducer/LogingReducer.js";
+import Step1BasicInfo from "../components/layout/mentorProfile/Step1BasicInfo.js";
+import Step2ExpertiseSkills from "../components/layout/mentorProfile/Step2ExpertiseSkills.js";
 import Step3EducationCertifications from "../components/layout/mentorProfile/Step3EducationCertifications.jsx";
 import Step4Availability from "../components/layout/mentorProfile/Step4Availability.jsx";
 import Step5Pricing from "../components/layout/mentorProfile/Step5Pricing.jsx";
@@ -17,56 +17,63 @@ import Step6SocialPortfolio from "../components/layout/mentorProfile/Step6Social
 import Step7DemoVideo from "../components/layout/mentorProfile/Step7DemoVideo.jsx";
 import Step8Terms from "../components/layout/mentorProfile/Step8Terms.jsx";
 import Step9Preview from "../components/layout/mentorProfile/Step9Preview.jsx";
+import type {
+  currencySymbols,
+  MentorApprovalData,
+  newSlot,
+} from "../interfaces/MPCInterface.js";
 
 const apiKey = "5eba8f49c8a995e0e09ddd9c";
 
 function MentorProfileCreation() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState(1);
   const { userName, UserProfilePhoto, reapprovalStatus, reapprovalFields } =
-    useContext(LoginContext);
+    useSelector((state: any) => state.auth);
   const { id } = useParams();
   const isReapproval = reapprovalStatus === "reapproval_pending";
 
-  const [mentorApprovalData, setMentorApprovalData] = useState({
-    fullName: userName || "",
-    profilePicture: UserProfilePhoto || "",
-    professionalTitle: "",
-    bio: "",
-    skills: [],
-    primaryCategory: "",
-    experienceLevel: "",
-    yearsOfExperience: "",
-    highestQualification: "",
-    certifications: [],
-    resume: "",
-    status: isReapproval ? "reapproval_pending" : "pending_approval",
-    timeSlots: [],
-    preferredDays: [],
-    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    sessionPrice: "",
-    currency: "USD",
-    sessionDuration: "60",
-    linkedin: "",
-    github: "",
-    portfolio: "",
-    youtube: "",
-    demoVideo: "",
-    experience: "",
-    teachingStyle: "",
-    languages: [],
-    agreedToTerms: false,
-    agreedToNDA: false,
-  });
+  const [mentorApprovalData, setMentorApprovalData] =
+    useState<MentorApprovalData>({
+      fullName: userName || "",
+      profilePicture: UserProfilePhoto || "",
+      professionalTitle: "",
+      bio: "",
+      skills: [],
+      primaryCategory: "",
+      experienceLevel: "",
+      yearsOfExperience: "",
+      highestQualification: "",
+      certifications: [],
+      resume: "",
+      status: isReapproval ? "reapproval_pending" : "pending_approval",
+      timeSlots: [],
+      preferredDays: [],
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      sessionPrice: "",
+      currency: "USD",
+      sessionDuration: 60,
+      linkedin: "",
+      github: "",
+      portfolio: "",
+      youtube: "",
+      demoVideo: "",
+      experience: "",
+      teachingStyle: "",
+      languages: [],
+      agreedToTerms: false,
+      agreedToNDA: false,
+    });
 
   const [currencies, setCurrencies] = useState([]);
-  const [newSkill, setNewSkill] = useState("");
-  const [newCertification, setNewCertification] = useState("");
-  const [newLanguage, setNewLanguage] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [newSkill, setNewSkill] = useState<string>("");
+  const [newCertification, setNewCertification] = useState<string>("");
+  const [newLanguage, setNewLanguage] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const categories = [
+  const categories: string[] = [
     "Web Development",
     "AI/ML",
     "UI/UX",
@@ -78,15 +85,17 @@ function MentorProfileCreation() {
     "Blockchain",
     "Game Development",
   ];
-  const experienceLevels = ["Beginner", "Intermediate", "Expert"];
-  const sessionDurations = ["30", "45", "60", "90", "120"];
-  const teachingStyles = [
+
+  const experienceLevels: string[] = ["Beginner", "Intermediate", "Expert"];
+  const sessionDurations: string[] = ["30", "45", "60", "90", "120"];
+  const teachingStyles: string[] = [
     "Hands-on",
     "Lecture-based",
     "Interactive",
     "Project-based",
   ];
-  const languagesList = [
+
+  const languagesList: string[] = [
     "English",
     "Hindi",
     "Spanish",
@@ -95,7 +104,8 @@ function MentorProfileCreation() {
     "Mandarin",
     "Other",
   ];
-  const days = [
+
+  const days: string[] = [
     "Monday",
     "Tuesday",
     "Wednesday",
@@ -104,8 +114,9 @@ function MentorProfileCreation() {
     "Saturday",
     "Sunday",
   ];
-  const timeZones = Intl.supportedValuesOf("timeZone");
-  const currencySymbols = {
+
+  const timeZones: string[] = Intl.supportedValuesOf("timeZone");
+  const currencySymbols: currencySymbols = {
     USD: "$",
     INR: "₹",
     EUR: "€",
@@ -138,7 +149,7 @@ function MentorProfileCreation() {
     NGN: "₦",
   };
 
-  const [newSlot, setNewSlot] = useState({
+  const [newSlot, setNewSlot] = useState<newSlot>({
     day: "Monday",
     startTime: "09:00",
     endTime: "10:00",
@@ -213,7 +224,7 @@ function MentorProfileCreation() {
     setError("");
   };
 
-  const removeTimeSlot = (index) => {
+  const removeTimeSlot = (index: number) => {
     setMentorApprovalData({
       ...mentorApprovalData,
       timeSlots: mentorApprovalData.timeSlots.filter((_, i) => i !== index),
@@ -236,7 +247,7 @@ function MentorProfileCreation() {
     }
   };
 
-  const removeSkill = (skillToRemove) => {
+  const removeSkill = (skillToRemove: string) => {
     setMentorApprovalData({
       ...mentorApprovalData,
       skills: mentorApprovalData.skills.filter(
@@ -261,7 +272,7 @@ function MentorProfileCreation() {
     }
   };
 
-  const removeCertification = (certToRemove) => {
+  const removeCertification = (certToRemove: string) => {
     setMentorApprovalData({
       ...mentorApprovalData,
       certifications: mentorApprovalData.certifications.filter(
@@ -286,7 +297,7 @@ function MentorProfileCreation() {
     }
   };
 
-  const removeLanguage = (langToRemove) => {
+  const removeLanguage = (langToRemove: string) => {
     setMentorApprovalData({
       ...mentorApprovalData,
       languages: mentorApprovalData.languages.filter(
@@ -379,7 +390,7 @@ function MentorProfileCreation() {
     }
   };
 
-  const mentorApprovalRequest = async (e) => {
+  const mentorApprovalRequest = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const user = auth.currentUser;
     const uid = user?.uid;
@@ -402,12 +413,10 @@ function MentorProfileCreation() {
           reapproval_fields: [],
         };
 
-        // Ensure all reapprovalFields are processed and updated if changed
-        reapprovalFields.forEach((field) => {
-          const originalValue = originalData[field];
+        reapprovalFields.forEach((field: string) => {
+          const originalValue = originalData?.[field];
           const newValue = mentorApprovalData[field];
 
-          // Handle arrays and other types correctly
           if (Array.isArray(newValue)) {
             if (
               !Array.isArray(originalValue) ||
@@ -421,6 +430,8 @@ function MentorProfileCreation() {
         });
 
         await updateDoc(mentorRequestRef, updateData);
+        await signOut(auth);
+        dispatch(resetAuthState());
         alert("Profile updated successfully! Awaiting admin approval.");
         navigate("/login");
       } else {
@@ -438,6 +449,7 @@ function MentorProfileCreation() {
           userType: "pendingMentor",
         });
         await signOut(auth);
+        dispatch(resetAuthState());
         alert("Profile submitted! You'll be notified after approval.");
         navigate("/login");
       }
@@ -479,13 +491,13 @@ function MentorProfileCreation() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <h1>Error: {error}</h1>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+  //       <h1>Error: {error}</h1>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 font-sans">
@@ -649,7 +661,7 @@ function MentorProfileCreation() {
                             addTimeSlot={addTimeSlot}
                             removeTimeSlot={removeTimeSlot}
                             days={days}
-                            timeZones={timeZones}
+                            // timeZones={timeZones}
                             fields={reapprovalFields.filter((field) =>
                               [
                                 "timeSlots",

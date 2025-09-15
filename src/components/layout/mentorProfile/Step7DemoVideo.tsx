@@ -1,4 +1,4 @@
-import React from "react";
+import { ChangeEvent } from "react";
 
 const Step7DemoVideo = ({
   data,
@@ -9,13 +9,13 @@ const Step7DemoVideo = ({
   removeLanguage,
   handleFileUpload,
 }) => {
-  const teachingStyles = [
+  const teachingStyles: string[] = [
     "Hands-on",
     "Lecture-based",
     "Interactive",
     "Project-based",
   ];
-  const languages = [
+  const languages: string[] = [
     "English",
     "Hindi",
     "Spanish",
@@ -41,7 +41,9 @@ const Step7DemoVideo = ({
             </label>
             <textarea
               value={data.experience}
-              onChange={(e) => setData({ ...data, experience: e.target.value })}
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                setData({ ...data, experience: e.target.value })
+              }
               className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-gray-500 transition-all"
               rows={5}
               placeholder="Describe your teaching methodology, experience, and approach..."
@@ -58,7 +60,7 @@ const Step7DemoVideo = ({
             </label>
             <select
               value={data.teachingStyle}
-              onChange={(e) =>
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                 setData({ ...data, teachingStyle: e.target.value })
               }
               className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white transition-all"
@@ -116,7 +118,7 @@ const Step7DemoVideo = ({
           </div>
 
           <div className="flex flex-wrap gap-2 mt-2">
-            {data.languages.map((lang, index) => (
+            {data.languages.map((lang: string, index: number) => (
               <div
                 key={index}
                 className="flex items-center bg-gray-800 border border-gray-700 px-3 py-1 rounded-full"
@@ -183,7 +185,9 @@ const Step7DemoVideo = ({
                 type="file"
                 className="hidden"
                 accept="video/mp4"
-                onChange={(e) => handleFileUpload(e, "demoVideo")}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  handleFileUpload(e, "demoVideo")
+                }
               />
             </label>
           </div>

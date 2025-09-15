@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useContext } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { LoginContext } from "../../Context/LoginContext";
 
 const FeaturesSection = () => {
   const navigate = useNavigate();
-  const { loginState } = useContext(LoginContext);
+const loginState = useSelector((state) => state.auth.loginState);
+
 
   return (
     <section className="py-12 sm:py-16 md:py-20 bg-gray-800">

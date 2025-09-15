@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 
 const Step2ExpertiseSkills = ({
   data,
@@ -10,8 +10,7 @@ const Step2ExpertiseSkills = ({
   categories,
   experienceLevels,
 }) => {
-  // Array of 50 skills/technologies for suggestions
-  const suggestedSkills = [
+  const suggestedSkills: string[] = [
     "React JS",
     "React Native",
     "JavaScript",
@@ -64,7 +63,6 @@ const Step2ExpertiseSkills = ({
     "Web3.js",
   ];
 
-  // Filter suggestions based on input
   const getSuggestions = () => {
     if (!newSkill.trim()) return [];
     return suggestedSkills.filter((skill) =>
@@ -72,8 +70,7 @@ const Step2ExpertiseSkills = ({
     );
   };
 
-  // Handle suggestion click - simplified version
-  const handleSuggestionClick = (suggestion) => {
+  const handleSuggestionClick = (suggestion: string) => {
     if (!data.skills.includes(suggestion)) {
       setData({
         ...data,
@@ -99,7 +96,7 @@ const Step2ExpertiseSkills = ({
             </label>
             <select
               value={data.primaryCategory}
-              onChange={(e) =>
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                 setData({ ...data, primaryCategory: e.target.value })
               }
               className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white transition-all"
@@ -108,7 +105,7 @@ const Step2ExpertiseSkills = ({
               <option value="" className="text-gray-500">
                 Select your primary category
               </option>
-              {categories.map((category) => (
+              {categories.map((category: string) => (
                 <option key={category} value={category} className="text-white">
                   {category}
                 </option>
@@ -122,7 +119,7 @@ const Step2ExpertiseSkills = ({
             </label>
             <select
               value={data.experienceLevel}
-              onChange={(e) =>
+              onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                 setData({ ...data, experienceLevel: e.target.value })
               }
               className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white transition-all"
@@ -131,7 +128,7 @@ const Step2ExpertiseSkills = ({
               <option value="" className="text-gray-500">
                 Select your experience level
               </option>
-              {experienceLevels.map((level) => (
+              {experienceLevels.map((level: string) => (
                 <option key={level} value={level} className="text-white">
                   {level}
                 </option>
@@ -146,7 +143,7 @@ const Step2ExpertiseSkills = ({
             <input
               type="number"
               value={data.yearsOfExperience}
-              onChange={(e) =>
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setData({ ...data, yearsOfExperience: e.target.value })
               }
               className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-gray-500 transition-all"
@@ -173,10 +170,14 @@ const Step2ExpertiseSkills = ({
             <input
               type="text"
               value={newSkill}
-              onChange={(e) => setNewSkill(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setNewSkill(e.target.value)
+              }
               className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-yellow-400 text-white placeholder-Gray-500 transition-all"
               placeholder="Enter a skill (e.g. React, Python)"
-              onKeyPress={(e) => e.key === "Enter" && addSkill()}
+              onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) =>
+                e.key === "Enter" && addSkill()
+              }
             />
             <button
               type="button"
@@ -190,7 +191,7 @@ const Step2ExpertiseSkills = ({
           {/* Suggestions - Fixed version */}
           {newSkill.trim() && getSuggestions().length > 0 && (
             <div className="absolute z-50 mt-1 w-[70%] bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto mobile:max-h-40">
-              {getSuggestions().map((suggestion, index) => (
+              {getSuggestions().map((suggestion: string, index: number) => (
                 <div
                   key={index}
                   onClick={() => handleSuggestionClick(suggestion)}
@@ -203,7 +204,7 @@ const Step2ExpertiseSkills = ({
           )}
 
           <div className="flex flex-wrap gap-2 mt-2">
-            {data.skills.map((skill, index) => (
+            {data.skills.map((skill: string, index: number) => (
               <div
                 key={index}
                 className="flex items-center bg-gray-800 border border-gray-700 px-3 py-1 rounded-full"
